@@ -11,6 +11,44 @@ export default {
     },
     {
       title: true,
+      name: 'Products',
+      wrapper: {            // optional wrapper object
+        element: '',        // required valid HTML5 element tag
+        attributes: {}        // optional valid JS object with JS API naming ex: { className: "my-class", style: { fontFamily: "Verdana" }, id: "my-id"}
+      },
+      class: ''             // optional class names space delimited list for title item ex: "text-center"
+    },
+    {
+      name: 'List Products',
+      url: '/theme/colors',
+      icon: 'icon-list',
+    },
+    {
+      name: 'Add a new product',
+      url: '/theme/typography',
+      icon: 'icon-plus',
+    },
+    {
+      title: true,
+      name: 'Transactions',
+      wrapper: {            // optional wrapper object
+        element: '',        // required valid HTML5 element tag
+        attributes: {}        // optional valid JS object with JS API naming ex: { className: "my-class", style: { fontFamily: "Verdana" }, id: "my-id"}
+      },
+      class: ''             // optional class names space delimited list for title item ex: "text-center"
+    },
+    {
+      name: 'Genertate a new bill',
+      url: '/theme/colors',
+      icon: 'icon-plus',
+    },
+    {
+      name: 'History of transactions',
+      url: '/theme/typography',
+      icon: 'icon-list',
+    },
+    {
+      title: true,
       name: 'Theme',
       wrapper: {            // optional wrapper object
         element: '',        // required valid HTML5 element tag
