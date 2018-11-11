@@ -20,12 +20,12 @@ export default {
     },
     {
       name: 'List Products',
-      url: '/theme/colors',
+      url: '/list/products',
       icon: 'icon-list',
     },
     {
       name: 'Add a new product',
-      url: '/theme/typography',
+      url: '/add/product',
       icon: 'icon-plus',
     },
     {
