@@ -51,7 +51,7 @@ class Forms extends Component {
     event.preventDefault();
     console.log(this.state)
     let payload = {}
-    payload.name = this.state.name;
+    payload.productname = this.state.name;
     payload.description = this.state.description;
     payload.cost_price = this.state.cost_price;
     payload.percentage = this.state.percentage;

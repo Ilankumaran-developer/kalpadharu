@@ -7,19 +7,39 @@ class Products extends Component {
   {
     super(props);
     this.state={
-      products:[]
+      products:[],
+      currentpage:0 
     }
+    this.constructProduct = this.constructProduct.bind(this);
   }
   componentDidMount(){
     axios.get(`http://localhost:2018/show`).then((result)=>{
-      console.log(result)
+      
       this.setState({
-        products:result
+        products:result.data
       })
+      console.log(this.state.products)
 
     })
   }
+  constructProduct(){
+    let products = []
+    let clone = this.state.products
+    for(var i  in clone)
+    {
+      let temp = []
+      temp.push(<td>{clone[i].productname}</td>)
+      temp.push(<td>{clone[i].date_created}</td>)
+      temp.push(<td>{clone[i].cost_price}</td>)
+      temp.push(<td>{clone[i].percentage}</td>)
+      temp.push(<td><Button color="info">Edit</Button></td>)
+      temp.push(<td><Button color="danger">Delete</Button></td>)
+      products.push(<tr>{temp}</tr>)
+    }
+    return products;
+  }
   render() {
+    
     return (
       <div className="animated fadeIn">
        
@@ -43,16 +63,7 @@ class Products extends Component {
                   </tr>
                   </thead>
                   <tbody>
-                  <tr>
-                    <td>Coconut Oil</td>
-                    <td>2012/01/01</td>
-                    <td>10</td>
-                    <td>10 %</td>
-                    <td><Button block color="primary">edit</Button><Button block color="secondary">Delete</Button></td>
-                    <td>
-                      <Badge color="success">Active</Badge>
-                    </td>
-                  </tr>
+                  {this.constructProduct()}
                   
                   </tbody>
                 </Table>
