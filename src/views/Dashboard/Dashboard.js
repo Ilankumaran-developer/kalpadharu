@@ -21,7 +21,8 @@ import {
   Table,
 } from 'reactstrap';
 import { CustomTooltips } from '@coreui/coreui-plugin-chartjs-custom-tooltips';
-import { getStyle, hexToRgba } from '@coreui/coreui/dist/js/coreui-utilities'
+import { getStyle, hexToRgba } from '@coreui/coreui/dist/js/coreui-utilities';
+import axios from 'axios';
 
 // import Widget03 from '../../views/Widgets/Widget03'
 const Widget03 = lazy(() => import('../../views/Widgets/Widget03'));
@@ -457,14 +458,26 @@ const mainChartOpts = {
 class Dashboard extends Component {
   constructor(props) {
     super(props);
-
+    
     this.toggle = this.toggle.bind(this);
     this.onRadioBtnClick = this.onRadioBtnClick.bind(this);
 
     this.state = {
       dropdownOpen: false,
       radioSelected: 2,
+      transCount:0,
+      prodCount:0
     };
+  }
+  componentDidMount(){
+    axios.get(`http://localhost:2018/show`).then((result)=>{
+      
+      this.setState({
+        prodCount:result.data.length
+      })
+      //console.log(this.state.products)
+
+    })
   }
 
   toggle() {
@@ -500,7 +513,7 @@ class Dashboard extends Component {
                     </DropdownMenu> */}
                   </ButtonDropdown>
                 </ButtonGroup>
-                <div className="text-value">9</div>
+                <div className="text-value">{this.state.prodCount}</div>
                 <div>Total Products</div>
               </CardBody>
               <div className="chart-wrapper mx-3" style={{ height: '70px' }}>
@@ -524,7 +537,7 @@ class Dashboard extends Component {
                   </DropdownMenu>*/}
                   </Dropdown> 
                 </ButtonGroup>
-                <div className="text-value">9</div>
+                <div className="text-value">{this.state.transCount}</div>
                 <div>Total Transactions</div>
               </CardBody>
               <div className="chart-wrapper mx-3" style={{ height: '70px' }}>

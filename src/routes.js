@@ -192,6 +192,22 @@ const  Addproduct = Loadable({
   loading: Loading,
 })
 
+
+const EditProduct = Loadable({
+  loader: () => import('./views/Products/Addproduct/EditProduct'),
+  loading: Loading,
+})
+
+const AddTransaction = Loadable({
+  loader: () => import('./views/Transactions/Addtransaction/Addtransaction'),
+  loading: Loading
+})
+
+const ListTransactions = Loadable({
+  loader: () => import('./views/Transactions/Viewtransaction/Viewtransaction'),
+  loading: Loading
+})
+
 // https://github.com/ReactTraining/react-router/tree/master/packages/react-router-config
 const routes = [
   { path: '/', exact: true, name: 'Home', component: DefaultLayout },
@@ -237,6 +253,10 @@ const routes = [
   { path: '/charts', name: 'Charts', component: Charts },
   { path: '/users', exact: true,  name: 'Users', component: Users },
   { path: '/users/:id', exact: true, name: 'User Details', component: User },
+  { path: '/edit/product/:id',exact: true, name:'Product Details', component: EditProduct },
+  { path: '/add/transaction', exact: true, name:'Add Transaction', component: AddTransaction},
+  { path: '/list/transactions', exact: true, name:'List Transaction', component: ListTransactions}
+
 ];
 
 export default routes;

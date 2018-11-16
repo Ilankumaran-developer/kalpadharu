@@ -30,14 +30,14 @@ import { Redirect, Route, Switch } from 'react-router-dom';
 class Forms extends Component {
   constructor(props) {
     super(props);
-
+    
     this.toggle = this.toggle.bind(this);
     this.toggleFade = this.toggleFade.bind(this);
-    this.addproduct = this.addproduct.bind(this);
+    this.editproduct = this.editproduct.bind(this);
     this.namechange = this.namechange.bind(this);
     this.descriptionchange = this.descriptionchange.bind(this);
     this.costpricechange = this.costpricechange.bind(this);
-    this.percentagechange = this.percentagechange.bind(this)
+    this.spchange = this.spchange.bind(this)
     this.state = {
       collapse: true,
       fadeIn: true,
@@ -45,21 +45,37 @@ class Forms extends Component {
       name:'',
       description:'',
       cost_price:0.00,
-      percentage:0
+      selling_price:0,
+      id:this.props.match.params.id
     };
   }
-  addproduct(event){
+  componentDidMount(){
+    axios.post(`http://localhost:2018/showbyid`,{id:this.state.id}).then((result)=>{
+        console.log(result.data)
+   this.setState({name:result.data.productname})
+   this.setState({description:result.data.description})
+   this.setState({cost_price:result.data.cost_price})
+   this.setState({selling_price:result.data.selling_price})
+    
+      })
+  }
+  editproduct(event){
     event.preventDefault();
     console.log(this.state)
     let payload = {}
     payload.productname = this.state.name;
     payload.description = this.state.description;
     payload.cost_price = this.state.cost_price;
-    payload.selling_price = this.state.percentage;
-    axios.post(`http://localhost:2018/save`,payload).then((result)=>{
+    payload.selling_price = this.state.selling_price;
+    payload.id = this.state.id
+    axios.post(`http://localhost:2018/update`,payload).then((result)=>{
       console.log(result)
       if(result.status == 200)
       {
+        this.setState({name:result.productname})
+        this.setState({description:result.description})
+        this.setState({cost_price:result.cost_price})
+        this.setState({selling_price:result.selling_price})
         
         this.props.history.push('/list/products')
       }
@@ -75,8 +91,8 @@ class Forms extends Component {
   costpricechange(event){
     this.setState({cost_price: event.target.value})
   }
-  percentagechange(event){
-    this.setState({percentage: event.target.value})
+  spchange(event){
+    this.setState({selling_price: event.target.value})
   }
 
 
@@ -96,10 +112,10 @@ class Forms extends Component {
           <Col xs="12" md="6">
             <Card>
               <CardHeader>
-                <strong>Add a new product</strong>
+                <strong> Edit a product</strong>
               </CardHeader>
               <CardBody>
-                <Form  onSubmit={this.addproduct}  encType="multipart/form-data" className="form-horizontal">
+                <Form  onSubmit={this.editproduct}  encType="multipart/form-data" className="form-horizontal">
                   
                   <FormGroup row>
                     <Col md="3">
@@ -136,7 +152,7 @@ class Forms extends Component {
                         <div className="controls">
                           <InputGroup className="input-prepend">
                            
-                            <Input  id="appendedPrependedInput" size="16" type="number" value={this.state.percentage} onChange={this.percentagechange} />
+                            <Input  id="appendedPrependedInput" size="16" type="number" value={this.state.selling_price} onChange={this.spchange} />
                             
                           </InputGroup>
                         </div>
@@ -154,7 +170,7 @@ class Forms extends Component {
                   </FormGroup>
                   
               <CardFooter>
-                        <Button type="submit" color="primary">Submit</Button>
+                        <Button type="submit" color="primary">Edit</Button>
                         
                       </CardFooter>
                 </Form>

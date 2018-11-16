@@ -5,8 +5,8 @@ export default {
       url: '/dashboard',
       icon: 'icon-speedometer',
       badge: {
-        variant: 'info',
-        text: 'NEW',
+        variant: 'info'
+
       },
     },
     {
@@ -39,15 +39,15 @@ export default {
     },
     {
       name: 'Genertate a new bill',
-      url: '/theme/colors',
+      url: '/add/transaction',
       icon: 'icon-plus',
     },
     {
       name: 'History of transactions',
-      url: '/theme/typography',
+      url: '/list/transactions',
       icon: 'icon-list',
     },
-    {
+     {
       title: true,
       name: 'Theme',
       wrapper: {            // optional wrapper object
@@ -313,6 +313,6 @@ export default {
       icon: 'icon-layers',
       variant: 'danger',
       attributes: { target: '_blank', rel: "noopener" },
-    },
+    }, 
   ],
 };
