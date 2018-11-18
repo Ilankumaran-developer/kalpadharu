@@ -46,8 +46,8 @@ export default {
       name: 'History of transactions',
       url: '/list/transactions',
       icon: 'icon-list',
-    },
-     {
+    }
+     /* {
       title: true,
       name: 'Theme',
       wrapper: {            // optional wrapper object
@@ -313,6 +313,6 @@ export default {
       icon: 'icon-layers',
       variant: 'danger',
       attributes: { target: '_blank', rel: "noopener" },
-    }, 
+    }, */ 
   ],
 };
