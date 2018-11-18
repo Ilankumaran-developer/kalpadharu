@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import {
+  Alert,
   Badge,
   Button,
   ButtonDropdown,
@@ -28,6 +29,7 @@ import {
 import axios from 'axios';
 import { Redirect, Route, Switch } from 'react-router-dom';
 import Tables from '../../Base/Tables/Tables';
+import { parse } from 'path';
 
 class Forms extends Component {
   constructor(props) {
@@ -38,7 +40,12 @@ class Forms extends Component {
     this.addproduct = this.addproduct.bind(this);
     this.namechange = this.namechange.bind(this);
     this.unitchange = this.unitchange.bind(this);
-    this.constructTransaction = this.constructTransaction.bind(this);
+    this.generateBill = this.generateBill.bind(this);
+    this.userchange = this.userchange.bind(this);
+    this.service_charge_change = this.service_charge_change.bind(this)
+    this.onDismiss = this.onDismiss.bind(this);
+   // this.removeitem = this.removeitem.bind(this)
+    
     
    
     this.state = {
@@ -48,14 +55,20 @@ class Forms extends Component {
      products:[],
      transaction:[],
      product_id:'',
-     unit_price:'',
+     unit_price:0,
      selling_price_per_kg:0,
-     selling_price:0
+     selling_price:0,
+     productname:'',
+     user:'',
+     service_charge:0,
+     grand_total:0,
+     cost_price:0,
+     alert:false
     };
   }
   componentDidMount(){
     axios.get(`http://localhost:2018/show`).then((result)=>{
-      
+      console.log(result)
       this.setState({
         products:result.data
       })
@@ -63,20 +76,10 @@ class Forms extends Component {
 
     })
   }
-  constructTransaction(){
-    let trans = []
-    let clone = this.state.transaction
-    for(var i  in clone)
-    {
-      let temp = []
-      temp.push(<td>{clone[i].product_id}</td>)
-      temp.push(<td>{clone[i].unit}</td>)
-      
-      temp.push(<td>{clone[i].selling_price}</td>)
-    
-    }
-    return trans;
+  onDismiss(){
+    this.setState({alert:false})
   }
+ 
   constructProduct(){
     let products = []
     let clone = this.state.products
@@ -88,16 +91,40 @@ class Forms extends Component {
     }
     return products;
   }
+  removeitem(index){
+    console.log(index)
+    let temp = [];
+    temp = this.state.transaction;
+    delete temp[index];
+    this.setState({
+      transaction:temp
+    })
+  }
   addproduct(event){
     event.preventDefault();
     let temp = [];
+    temp = this.state.transaction;
+    let profit  = parseFloat(this.state.selling_price) - parseFloat(this.state.cost_price);
     temp.push({
-        product_id : this.state.product_id,
+        product_name : this.state.productname,
         unit:this.state.unit_price,
-        selling_price:this.state.selling_price
+        selling_price:this.state.selling_price,
+        cost_price:this.state.cost_price,
+        profit:profit
     })
-    this.setState({transaction:temp})
     
+    this.setState({transaction:temp})
+  this.setState({product_id:''})
+  this.setState({unit_price:0})
+  this.setState({selling_price:0});
+  this.setState({cost_price:0});
+  let tot = 0;
+  for(let i in this.state.transaction)
+  {
+    tot = parseFloat(tot) + parseFloat(this.state.transaction[i].selling_price)
+  }
+  tot = parseFloat(tot).toFixed(2)
+    this.setState({grand_total:tot})
   }
   unitchange(event)
   {
@@ -105,22 +132,66 @@ class Forms extends Component {
       this.setState({
         unit_price : event.target.value
       })
-      let sp = this.selling_price_per_kg * parseFloat(this.state.unit_price) 
+      console.log(this.state.selling_price_per_kg)
+      let sp = this.state.selling_price_per_kg * parseFloat(event.target.value) 
       this.setState({
           selling_price: sp
       })
   }
   namechange(event){
     event.preventDefault();
-    console.log(event.target.value)
+   
     for(let i in this.state.products)
     {
         if(this.state.products[i]._id == event.target.value)
         {
             this.setState({selling_price_per_kg:this.state.products[i].selling_price})
+            this.setState({cost_price:this.state.products[i].cost_price});
+            this.setState({productname:this.state.products[i].productname})
         }
     }
     this.setState({product_id:event.target.value})
+    }
+    userchange(event){
+      this.setState({user:event.target.value})
+    }
+    generateBill(event)
+    {
+      event.preventDefault();
+      
+      let payload ={};
+      payload.user = this.state.user;
+      payload.transaction = this.state.transaction;
+      payload.service_tax = parseFloat(this.state.service_charge).toFixed(2);
+      payload.total = parseFloat(this.state.grand_total) - parseFloat(this.state.service_charge);
+      let totprofit = 0;
+      for(let i in this.state.transaction)
+      {
+        totprofit = parseFloat(totprofit) + parseFloat(this.state.transaction[i].profit)
+
+      }
+      payload.profit = totprofit;
+      payload.grand_total = parseFloat(this.state.grand_total).toFixed(2);
+      console.log(payload)
+      axios.post('http://localhost:2018/saveTransaction',payload).then((result)=>{
+      this.setState({alert:true})
+      })
+
+    }
+    service_charge_change(event){
+      if(event.target.value && !isNaN(event.target.value))
+      {
+        this.setState({service_charge:event.target.value})
+        let grtot = 0;
+        for(let i in this.state.transaction)
+        {
+          grtot = parseFloat(grtot) + parseFloat(this.state.transaction[i].selling_price)
+        }
+        grtot = parseFloat(grtot) + parseFloat(event.target.value)
+        grtot = parseFloat(grtot).toFixed(2);
+        this.setState({grand_total:grtot});
+      }
+   
     }
 
  
@@ -144,7 +215,7 @@ class Forms extends Component {
           <Col xs="12" md="6">
             <Card>
               <CardHeader>
-                <strong>Add a new item into transaction</strong>
+                <strong>Add a new line item into transaction</strong>
               </CardHeader>
               <CardBody>
                 <Form  onSubmit={this.addproduct}  encType="multipart/form-data" className="form-horizontal">
@@ -176,7 +247,7 @@ class Forms extends Component {
                   <FormGroup>
                         <Label htmlFor="appendedPrependedInput">Selling Price of the product</Label>
                         <div className="controls">
-                            <span></span>
+                            <span>{this.state.selling_price}</span>
                         </div>
                       </FormGroup>
                   
@@ -185,6 +256,61 @@ class Forms extends Component {
                         <Button type="submit" color="primary">Add Item</Button>
                         
                       </CardFooter>
+                </Form>
+              </CardBody>
+              
+            </Card>
+            <Card>
+              <CardHeader>
+                <strong>User Info</strong>
+              </CardHeader>
+              <CardBody>
+                <Form  onSubmit={this.generateBill}  encType="multipart/form-data" className="form-horizontal">
+                  
+                  
+                                   
+                  
+                  <FormGroup row>
+                    <Col md="3">
+                      <Label htmlFor="text-input">Name/Mobile/Email of the user</Label>
+                    </Col>
+                    <Col xs="12" md="9">
+                      <Input type="text"  id="text-input" name="text-input" value={this.state.user} onChange={this.userchange} placeholder="username/mobile/email" />
+                      <FormText color="muted">Enter mobile number/name/email of user</FormText>
+                    </Col>
+                  </FormGroup>
+
+
+                  <FormGroup row>
+                    <Col md="3">
+                      <Label htmlFor="text-input">Service charge (GST) if any</Label>
+                    </Col>
+                    <Col xs="12" md="9">
+                      <Input type="number"  id="text-input" min="0" name="text-input" value={this.state.service_charge} onChange={this.service_charge_change} placeholder="Service charge" />
+                      <FormText color="muted">Enter the service charge</FormText>
+                    </Col>
+                  </FormGroup>
+
+                  <FormGroup row>
+                    <Col md="3">
+                      <Label htmlFor="text-input">Grand Total</Label>
+                    </Col>
+                    <Col xs="12" md="9">
+                      <span>{this.state.grand_total}</span>
+                    </Col>
+                  </FormGroup>
+                  
+                  
+                 
+                  
+                  
+              <CardFooter>
+                        <Button type="submit" color="primary">Generate Bill</Button>
+                        
+                      </CardFooter>
+                      <Alert color="info" isOpen={this.state.alert} toggle={this.onDismiss}>
+                  Transaction successfully saved!
+                </Alert>
                 </Form>
               </CardBody>
               
@@ -209,9 +335,18 @@ class Forms extends Component {
                     </tr>
                     </thead>
                     <tbody>
-                    {this.constructTransaction()}
+                    {this.state.transaction.map((item,i)=>{
+                      return[
+                        <tr>
+                          <td>{item.product_name}</td>
+                          <td>{item.unit}</td>
+                          <td>{item.selling_price} <Button  color="danger" onClick={this.removeitem.bind(this,i)} size="sm" className="btn-pill">Remove</Button></td>
+                        </tr>
+                      ]
+                    })}
                         </tbody>
                 </Table>
+               
                   </CardBody>
                   </Card>
           </Col>

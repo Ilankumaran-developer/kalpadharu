@@ -7,18 +7,18 @@ class Products extends Component {
   {
     super(props);
     this.state={
-      products:[],
+      transactions:[],
       currentpage:0 
     }
-    this.constructProduct = this.constructProduct.bind(this);
+    this.constructHistory = this.constructHistory.bind(this);
     this.deleteProduct = this.deleteProduct.bind(this);
     this.editProduct = this.editProduct.bind(this);
   }
   componentDidMount(){
-    axios.get(`http://localhost:2018/show`).then((result)=>{
-      
+    axios.get(`http://localhost:2018/showtransactions`).then((result)=>{
+      console.log(result)
       this.setState({
-        products:result.data
+        transactions:result.data
       })
       //console.log(this.state.products)
 
@@ -36,24 +36,25 @@ class Products extends Component {
       })
     })
   }
-  constructProduct(){
-    let products = []
-    let clone = this.state.products
+  constructHistory(){
+    let transactions = []
+    let clone = this.state.transactions
     for(var i  in clone)
     {
       let temp = []
-      temp.push(<td>{clone[i].productname}</td>)
+      temp.push(<td>{clone[i].user}</td>)
       temp.push(<td>{clone[i].date_created}</td>)
-      temp.push(<td>{clone[i].cost_price}</td>)
-      temp.push(<td>{clone[i].selling_price}</td>)
-      temp.push(<td><Button onClick={this.editProduct.bind(this,clone[i]._id)}  color="info">Edit</Button></td>)
-      temp.push(<td><Button onClick={this.deleteProduct.bind(this,clone[i])} color="danger">Delete</Button></td>)
-      products.push(<tr>{temp}</tr>)
+      temp.push(<td>{clone[i].grand_total}</td>)
+      temp.push(<td>{clone[i].profit}</td>)
+      temp.push(<td>{clone[i].service_tax}</td>)
+      temp.push(<td><Button onClick={this.editProduct.bind(this,clone[i]._id)}  color="info">View Transaction</Button><Button onClick={this.editProduct.bind(this,clone[i]._id)}  color="danger">Delete Transaction</Button></td>)
+      
+      transactions.push(<tr>{temp}</tr>)
     }
-    return products;
+    return transactions;
   }
   render() {
-    if(this.state.products.length > 0)
+    if(this.state.transactions.length > 0)
     {
       return (
         <div className="animated fadeIn">
@@ -69,16 +70,19 @@ class Products extends Component {
                   <Table hover bordered striped responsive size="sm">
                     <thead>
                     <tr>
-                      <th>Product Name</th>
+                      <th>User</th>
                       <th>Date Added</th>
-                      <th>Cost price (per kg)</th>
-                      <th>Selling Price (per kg)</th>
+                      <th>Grand total</th>
+                      <th>
+                        Profit
+                      </th>
+                      <th>Service Tax</th>
                       <th>Action</th>
-                      <th>Status</th>
+                     
                     </tr>
                     </thead>
                     <tbody>
-                    {this.constructProduct()}
+                    {this.constructHistory()}
                     
                     </tbody>
                   </Table>
@@ -107,7 +111,7 @@ class Products extends Component {
       return (
         <div className="animated fadeIn">
           <Row>
-            <h1>No Products Found</h1>
+            <h1>No Transactions Found</h1>
             </Row>
         </div>
       )
