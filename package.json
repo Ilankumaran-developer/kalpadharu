@@ -37,7 +37,8 @@
     "react-test-renderer": "^16.6.1",
     "reactstrap": "^6.5.0",
     "request": "^2.88.0",
-    "simple-line-icons": "^2.4.1"
+    "simple-line-icons": "^2.4.1",
+    "react-scripts": "^2.1.1"
   },
   "devDependencies": {
     "react-scripts": "^2.1.1"
