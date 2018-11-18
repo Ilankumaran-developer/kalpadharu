@@ -56,7 +56,7 @@ class Forms extends Component {
     payload.description = this.state.description;
     payload.cost_price = this.state.cost_price;
     payload.selling_price = this.state.percentage;
-    axios.post(`http://localhost:2018/save`,payload).then((result)=>{
+    axios.post(`https://kalpatharu-backend.herokuapp.com/save`,payload).then((result)=>{
       console.log(result)
       if(result.status == 200)
       {
