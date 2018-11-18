@@ -15,7 +15,7 @@ class Products extends Component {
     this.editProduct = this.editProduct.bind(this);
   }
   componentDidMount(){
-    axios.get(`http://localhost:2018/showtransactions`).then((result)=>{
+    axios.get(`https://kalpatharu-backend.herokuapp.com/showtransactions`).then((result)=>{
       console.log(result)
       this.setState({
         transactions:result.data
@@ -29,7 +29,7 @@ class Products extends Component {
   }
   deleteProduct(val,e){
     console.log(val,e)
-    axios.post('http://localhost:2018/deleteProduct',val).then((result)=>{
+    axios.post('https://kalpatharu-backend.herokuapp.com/deleteProduct',val).then((result)=>{
       console.log(result)
       this.setState({
         products:result.data.products

@@ -470,7 +470,7 @@ class Dashboard extends Component {
     };
   }
   componentDidMount(){
-    axios.get(`http://localhost:2018/show`).then((result)=>{
+    axios.get(`https://kalpatharu-backend.herokuapp.com/show`).then((result)=>{
       
       this.setState({
         prodCount:result.data.length
