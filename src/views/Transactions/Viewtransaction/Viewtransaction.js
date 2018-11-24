@@ -11,11 +11,12 @@ class Products extends Component {
       currentpage:0 
     }
     this.constructHistory = this.constructHistory.bind(this);
-    this.deleteProduct = this.deleteProduct.bind(this);
-    this.editProduct = this.editProduct.bind(this);
+    this.deleteTransaction = this.deleteTransaction.bind(this);
+    this.editTransaction = this.editTransaction.bind(this);
+    this.viewInvoice  = this.viewInvoice.bind(this);
   }
   componentDidMount(){
-    axios.get(`https://kalpatharu-backend.herokuapp.com/showtransactions`).then((result)=>{
+    axios.get(`http://localhost:2018/showtransactions`).then((result)=>{
       console.log(result)
       this.setState({
         transactions:result.data
@@ -24,15 +25,19 @@ class Products extends Component {
 
     })
   }
-  editProduct(id){
-    this.props.history.push('/edit/product/'+id)
+  editTransaction(id){
+    this.props.history.push('/edit/transaction/'+id)
   }
-  deleteProduct(val,e){
+  viewInvoice(id){
+    this.props.history.push('/view/Invoice/'+id)
+  }
+  deleteTransaction(val,e){
     console.log(val,e)
-    axios.post('https://kalpatharu-backend.herokuapp.com/deleteProduct',val).then((result)=>{
+    let url = process.env.url+'/deleteTransaction';
+    axios.post(url,val).then((result)=>{
       console.log(result)
       this.setState({
-        products:result.data.products
+        transactions:result.data
       })
     })
   }
@@ -47,7 +52,7 @@ class Products extends Component {
       temp.push(<td>{clone[i].grand_total}</td>)
       temp.push(<td>{clone[i].profit}</td>)
       temp.push(<td>{clone[i].service_tax}</td>)
-      temp.push(<td><Button onClick={this.editProduct.bind(this,clone[i]._id)}  color="info">View Transaction</Button><Button onClick={this.editProduct.bind(this,clone[i]._id)}  color="danger">Delete Transaction</Button></td>)
+      temp.push(<td><Button onClick={this.editTransaction.bind(this,clone[i]._id)} color="info">View Transaction</Button><Button onClick={this.viewInvoice.bind(this,clone[i]._id)}  color="info">View Invoice</Button></td>)
       
       transactions.push(<tr>{temp}</tr>)
     }

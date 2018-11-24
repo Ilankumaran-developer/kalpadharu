@@ -67,7 +67,7 @@ class Forms extends Component {
     };
   }
   componentDidMount(){
-    axios.get(`https://kalpatharu-backend.herokuapp.com/show`).then((result)=>{
+    axios.get(`http://localhost:2018/show`).then((result)=>{
       console.log(result)
       this.setState({
         products:result.data
@@ -110,7 +110,8 @@ class Forms extends Component {
         unit:this.state.unit_price,
         selling_price:this.state.selling_price,
         cost_price:this.state.cost_price,
-        profit:profit
+        profit:profit,
+        product_id:this.state.product_id
     })
     
     this.setState({transaction:temp})
@@ -165,15 +166,17 @@ class Forms extends Component {
       payload.service_tax = parseFloat(this.state.service_charge).toFixed(2);
       payload.total = parseFloat(this.state.grand_total) - parseFloat(this.state.service_charge);
       let totprofit = 0;
+      payload.product_ids = [];
       for(let i in this.state.transaction)
       {
         totprofit = parseFloat(totprofit) + parseFloat(this.state.transaction[i].profit)
+        payload.product_ids.push(this.state.transaction[i].product_id)
 
       }
       payload.profit = totprofit;
       payload.grand_total = parseFloat(this.state.grand_total).toFixed(2);
       console.log(payload)
-      axios.post('https://kalpatharu-backend.herokuapp.com/saveTransaction',payload).then((result)=>{
+      axios.post('http://localhost:2018/saveTransaction',payload).then((result)=>{
       this.setState({alert:true})
       })
 
