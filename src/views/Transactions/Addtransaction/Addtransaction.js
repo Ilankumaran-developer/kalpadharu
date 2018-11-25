@@ -67,7 +67,7 @@ class Forms extends Component {
     };
   }
   componentDidMount(){
-    axios.get(`http://localhost:2018/show`).then((result)=>{
+    axios.get(`https://kalpatharu-backend.herokuapp.com/show`).then((result)=>{
       console.log(result)
       this.setState({
         products:result.data
@@ -176,7 +176,7 @@ class Forms extends Component {
       payload.profit = totprofit;
       payload.grand_total = parseFloat(this.state.grand_total).toFixed(2);
       console.log(payload)
-      axios.post('http://localhost:2018/saveTransaction',payload).then((result)=>{
+      axios.post('https://kalpatharu-backend.herokuapp.com/saveTransaction',payload).then((result)=>{
       this.setState({alert:true})
       })
 

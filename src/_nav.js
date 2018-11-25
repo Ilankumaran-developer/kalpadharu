@@ -58,7 +58,7 @@ export default {
     },
     {
       name: 'Mail Settings',
-      url: '/add/transaction',
+      url: '/settings/mail',
       icon: 'icon-plus',
     },
     /* {

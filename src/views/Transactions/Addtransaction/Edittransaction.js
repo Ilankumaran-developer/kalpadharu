@@ -60,7 +60,7 @@ class Forms extends Component {
     }
     componentDidMount() {
 
-        axios.post(`http://localhost:2018/showtransbyid`, { id: this.state.id }).then((result) => {
+        axios.post(`https://kalpatharu-backend.herokuapp.com/showtransbyid`, { id: this.state.id }).then((result) => {
             console.log(result.data)
             this.setState({ transaction: result.data.transaction })
             this.setState({ grand_total: result.data.grand_total })

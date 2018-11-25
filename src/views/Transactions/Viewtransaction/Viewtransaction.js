@@ -16,7 +16,7 @@ class Products extends Component {
     this.viewInvoice  = this.viewInvoice.bind(this);
   }
   componentDidMount(){
-    axios.get(`http://localhost:2018/showtransactions`).then((result)=>{
+    axios.get(`https://kalpatharu-backend.herokuapp.com/showtransactions`).then((result)=>{
       console.log(result)
       this.setState({
         transactions:result.data
@@ -52,7 +52,7 @@ class Products extends Component {
       temp.push(<td>{clone[i].grand_total}</td>)
       temp.push(<td>{clone[i].profit}</td>)
       temp.push(<td>{clone[i].service_tax}</td>)
-      temp.push(<td><Button onClick={this.editTransaction.bind(this,clone[i]._id)} color="info">View Transaction</Button><Button onClick={this.viewInvoice.bind(this,clone[i]._id)}  color="info">View Invoice</Button></td>)
+      temp.push(<td><Button onClick={this.viewInvoice.bind(this,clone[i]._id)}  color="info">View Invoice</Button>&nbsp;<Button onClick={this.viewInvoice.bind(this,clone[i]._id)}  color="danger">Email to user</Button>&nbsp;<Button onClick={this.viewInvoice.bind(this,clone[i]._id)}  color="success">Download as PDF</Button></td>)
       
       transactions.push(<tr>{temp}</tr>)
     }

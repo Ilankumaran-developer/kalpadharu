@@ -218,6 +218,11 @@ const ViewInvoice = Loadable({
   loading: Loading
 })
 
+const AddSetting = Loadable({
+  loader: () => import('./views/Settings/Mailsettings/Mailsettings'),
+  loading: Loading
+})
+
 // https://github.com/ReactTraining/react-router/tree/master/packages/react-router-config
 const routes = [
   { path: '/', exact: true, name: 'Home', component: DefaultLayout },
@@ -268,6 +273,7 @@ const routes = [
   { path: '/list/transactions', exact: true, name:'List Transaction', component: ListTransactions},
   { path: '/edit/transaction/:id',exact: true, name:'View Transaction Detals', component: EditTransaction },
   { path: '/view/Invoice/:id', exact:true, name:'View Invoice',component: ViewInvoice},
+  { path: '/settings/mail', exact:true, name:'eMail Settings',component: AddSetting },
 
 ];
 

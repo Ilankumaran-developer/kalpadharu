@@ -19,7 +19,7 @@ class Invoice extends Component {
         }
     }
     componentDidMount() {
-        axios.post(`http://localhost:2018/showtransbyid`, { id: this.state.id }).then((result) => {
+        axios.post(`https://kalpatharu-backend.herokuapp.com/showtransbyid`, { id: this.state.id }).then((result) => {
             console.log(result.data)
             this.setState({transaction:result.data.transaction})
             this.setState({user:result.data.user})
@@ -28,7 +28,7 @@ class Invoice extends Component {
             this.setState({subtotal:result.data.total})
             this.setState({service_tax:result.data.service_tax})
             this.setState({grand_total:result.data.grand_total})
-            axios.post(`http://localhost:2018/getProdDetails`,{ids:this.state.ids}).then((result1)=>{
+            axios.post(`https://kalpatharu-backend.herokuapp.com/getProdDetails`,{ids:this.state.ids}).then((result1)=>{
                 console.log(result1)
                 this.setState({products:result1.data})
             })
