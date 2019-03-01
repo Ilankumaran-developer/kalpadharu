@@ -3,6 +3,7 @@ import axios from 'axios';
 import { Redirect, Route, Switch } from 'react-router-dom';
 import { Button, Badge, Card, CardBody, CardHeader, Col, Pagination, PaginationItem, PaginationLink, Row, Table } from 'reactstrap';
 import '../../../Invoice.scss';
+import {Alert} from 'reactstrap';
 
 class Invoice extends Component {
     constructor(props) {
@@ -15,23 +16,37 @@ class Invoice extends Component {
             date_created:'',
             ids : [],
             subtotal:'',
-            products:[]
+            products:[],
+            err:false
         }
     }
     componentDidMount() {
-        axios.post(`https://kalpatharu-backend.herokuapp.com/showtransbyid`, { id: this.state.id }).then((result) => {
+        axios.post(`http://localhost:2018/showtransbyid`, { id: this.state.id }).then((result) => {
             console.log(result.data)
-            this.setState({transaction:result.data.transaction})
+            if(result.status == 200){
+                this.setState({transaction:result.data.transaction})
             this.setState({user:result.data.user})
             this.setState({date_created:result.data.date_created})
             this.setState({ids:result.data.product_ids})
             this.setState({subtotal:result.data.total})
             this.setState({service_tax:result.data.service_tax})
             this.setState({grand_total:result.data.grand_total})
-            axios.post(`https://kalpatharu-backend.herokuapp.com/getProdDetails`,{ids:this.state.ids}).then((result1)=>{
-                console.log(result1)
+            axios.post(`http://localhost:2018/getProdDetails`,{ids:this.state.ids}).then((result1)=>{
+                if(result1.status == 200)
+                {
+                    console.log(result1)
                 this.setState({products:result1.data})
+                }
+                else{
+                    this.setState({err:true});
+                }
+                
             })
+            }
+            else{
+                this.setState({err: true});
+            }
+            
             
         })
         
@@ -61,6 +76,9 @@ class Invoice extends Component {
     render() {
         return (
             <div className="animated fadeIn">
+             <Alert color="danger" isOpen={this.state.err}>
+         There is some error occured in server...Sorry for that
+      </Alert>
                 <div className="container">
                     <Row>
                         <Col xs="12" md="6">

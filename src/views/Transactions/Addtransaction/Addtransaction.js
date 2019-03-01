@@ -30,6 +30,8 @@ import axios from 'axios';
 import { Redirect, Route, Switch } from 'react-router-dom';
 import Tables from '../../Base/Tables/Tables';
 import { parse } from 'path';
+import {HashLoader} from 'react-spinners';
+import {css} from '@emotion/core';
 
 class Forms extends Component {
   constructor(props) {
@@ -63,15 +65,22 @@ class Forms extends Component {
      service_charge:0,
      grand_total:0,
      cost_price:0,
-     alert:false
+     alert:false,
+     err:false,
+     loading:true
     };
   }
   componentDidMount(){
-    axios.get(`https://kalpatharu-backend.herokuapp.com/show`).then((result)=>{
+    axios.get(`http://localhost:2018/show`).then((result)=>{
       console.log(result)
-      this.setState({
-        products:result.data
-      })
+      if(result.status == 200)
+      {
+        this.setState({products:result.data,loading:false})
+      }
+      else{
+        this.setState({err:true,loading:false});
+      }
+      
       //console.log(this.state.products)
 
     })
@@ -176,8 +185,14 @@ class Forms extends Component {
       payload.profit = totprofit;
       payload.grand_total = parseFloat(this.state.grand_total).toFixed(2);
       console.log(payload)
-      axios.post('https://kalpatharu-backend.herokuapp.com/saveTransaction',payload).then((result)=>{
-      this.setState({alert:true})
+      axios.post('http://localhost:2018/saveTransaction',payload).then((result)=>{
+        if(result.status == 200){
+          this.setState({alert:true})
+        }
+        else{
+          this.setState({err:true})
+        }
+      
       })
 
     }
@@ -211,9 +226,17 @@ class Forms extends Component {
   }
 
   render() {
+    const override = css`
+    display: block;
+    margin: 0 auto;
+    border-color: red;
+`;
+    if(this.state.products.length > 0 && !this.loading){
     return (
       <div className="animated fadeIn">
-        
+         <Alert color="danger" isOpen={this.state.err}>
+         There is some error occured in server...Sorry for that
+      </Alert>
         <Row>
           <Col xs="12" md="6">
             <Card>
@@ -359,6 +382,21 @@ class Forms extends Component {
                
       </div>
     );
+                  }
+                  else if(this.state.loading)
+                  {
+                    return (
+                      <div className="animated fadeIn">
+                       <HashLoader
+                          css={override}
+                          sizeUnit={"px"}
+                          size={150}
+                          color={'#123abc'}
+                          loading={this.state.loading}
+                        /> 
+                      </div>
+                      )
+                  }
   }
 }
 

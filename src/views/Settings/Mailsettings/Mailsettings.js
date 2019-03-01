@@ -60,8 +60,10 @@ class Forms extends Component {
       console.log(result)
       if(result.status == 200)
       {
-        
         this.props.history.push('/list/products')
+      }
+      else{
+        this.setState({err:true});
       }
       console.log(result)
     })

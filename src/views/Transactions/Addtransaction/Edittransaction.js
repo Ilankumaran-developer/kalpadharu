@@ -55,17 +55,25 @@ class Forms extends Component {
             grand_total: 0,
             cost_price: 0,
             alert: false,
-            id: this.props.match.params.id
+            id: this.props.match.params.id,
+            err:false
         };
     }
     componentDidMount() {
 
-        axios.post(`https://kalpatharu-backend.herokuapp.com/showtransbyid`, { id: this.state.id }).then((result) => {
+        axios.post(`http://localhost:2018/showtransbyid`, { id: this.state.id }).then((result) => {
             console.log(result.data)
-            this.setState({ transaction: result.data.transaction })
-            this.setState({ grand_total: result.data.grand_total })
-            this.setState({ service_charge: result.data.service_tax })
-            this.setState({ user: result.data.user })
+            if(result.status == 200)
+            {
+                this.setState({ transaction: result.data.transaction })
+                this.setState({ grand_total: result.data.grand_total })
+                this.setState({ service_charge: result.data.service_tax })
+                this.setState({ user: result.data.user })
+            }
+            else{
+                this.setState({err: true});
+            }
+            
 
         })
     }
@@ -80,7 +88,9 @@ class Forms extends Component {
     render() {
         return (
             <div className="animated fadeIn">
-
+                 <Alert color="danger" isOpen={this.state.err}>
+         There is some error occured in server...Sorry for that
+      </Alert>
                 <Row>
                     <Col xs="12" md="6">
 

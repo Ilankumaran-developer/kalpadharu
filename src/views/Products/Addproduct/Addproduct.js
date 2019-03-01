@@ -26,6 +26,7 @@ import {
 } from 'reactstrap';
 import axios from 'axios';
 import { Redirect, Route, Switch } from 'react-router-dom';
+import { Alert } from 'reactstrap';
 
 class Forms extends Component {
   constructor(props) {
@@ -38,6 +39,7 @@ class Forms extends Component {
     this.descriptionchange = this.descriptionchange.bind(this);
     this.costpricechange = this.costpricechange.bind(this);
     this.percentagechange = this.percentagechange.bind(this)
+    this.unitChange = this.unitChange.bind(this);
     this.state = {
       collapse: true,
       fadeIn: true,
@@ -45,7 +47,9 @@ class Forms extends Component {
       name:'',
       description:'',
       cost_price:0.00,
-      percentage:0
+      percentage:0,
+      min_unit:0,
+      err: false
     };
   }
   addproduct(event){
@@ -56,14 +60,17 @@ class Forms extends Component {
     payload.description = this.state.description;
     payload.cost_price = this.state.cost_price;
     payload.selling_price = this.state.percentage;
-    axios.post(`https://kalpatharu-backend.herokuapp.com/save`,payload).then((result)=>{
+    payload.min_unit = this.state.min_unit;
+    axios.post(`http://localhost:2018/save`,payload).then((result)=>{
       console.log(result)
       if(result.status == 200)
       {
-        
-        this.props.history.push('/list/products')
+        this.props.history.push('/list/products');
       }
-      console.log(result)
+      else{
+        this.setState({err:true});
+      }
+        
     })
   }
   namechange(event){
@@ -78,6 +85,9 @@ class Forms extends Component {
   percentagechange(event){
     this.setState({percentage: event.target.value})
   }
+  unitChange(event){
+    this.setState({min_unit: event.target.value})
+  }
 
 
   toggle() {
@@ -91,7 +101,9 @@ class Forms extends Component {
   render() {
     return (
       <div className="animated fadeIn">
-        
+        <Alert color="danger" isOpen={this.state.err}>
+         There is some error occured in server...Sorry for that
+      </Alert>
         <Row>
           <Col xs="12" md="6">
             <Card>
@@ -129,6 +141,17 @@ class Forms extends Component {
                       <FormText color="muted">Enter the cost price of the product</FormText>
                     </Col>
                   </FormGroup>
+
+                  <FormGroup>
+                        <Label htmlFor="appendedPrependedInput">Minimum unit of the product</Label>
+                        <div className="controls">
+                          <InputGroup className="input-prepend">
+                           
+                            <Input  id="appendedPrependedInput" size="16" type="number" value={this.state.min_unit} step="0.1" onChange={this.unitChange} />
+                            
+                          </InputGroup>
+                        </div>
+                      </FormGroup>
                   
                   
                   <FormGroup>

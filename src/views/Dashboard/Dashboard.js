@@ -23,6 +23,7 @@ import {
 import { CustomTooltips } from '@coreui/coreui-plugin-chartjs-custom-tooltips';
 import { getStyle, hexToRgba } from '@coreui/coreui/dist/js/coreui-utilities';
 import axios from 'axios';
+import { Alert } from 'reactstrap';
 
 // import Widget03 from '../../views/Widgets/Widget03'
 const Widget03 = lazy(() => import('../../views/Widgets/Widget03'));
@@ -466,15 +467,20 @@ class Dashboard extends Component {
       dropdownOpen: false,
       radioSelected: 2,
       transCount:0,
-      prodCount:0
+      prodCount:0,
+      err:false
     };
   }
   componentDidMount(){
-    axios.get(`https://kalpatharu-backend.herokuapp.com/show`).then((result)=>{
-      
-      this.setState({
-        prodCount:result.data.length
-      })
+    axios.get(`http://localhost:2018/show`).then((result)=>{
+      console.log(result);
+      if(result.status == 200){
+        this.setState({prodCount:result.data.length})
+      }
+      else{
+        this.setState({err:true});
+      }
+       
       //console.log(this.state.products)
 
     })
@@ -495,7 +501,11 @@ class Dashboard extends Component {
   render() {
 
     return (
+      
       <div className="animated fadeIn">
+      <Alert color="danger" isOpen={this.state.err}>
+        There is some error occured in server...Sorry for that
+      </Alert>
         <Row>
           <Col xs="12" sm="6" lg="3">
             <Card className="text-white bg-info">

@@ -1,6 +1,9 @@
 import React, { Component } from 'react';
 import { Button,Badge, Card, CardBody, CardHeader, Col, Pagination, PaginationItem, PaginationLink, Row, Table } from 'reactstrap';
 import axios from 'axios';
+import { Alert } from 'reactstrap';
+import {HashLoader} from 'react-spinners';
+import { css } from '@emotion/core';
 
 class Products extends Component {
   constructor(props)
@@ -8,20 +11,25 @@ class Products extends Component {
     super(props);
     this.state={
       products:[],
-      currentpage:0 
+      currentpage:0 ,
+      err:false,
+      loading:true
     }
     this.constructProduct = this.constructProduct.bind(this);
     this.deleteProduct = this.deleteProduct.bind(this);
     this.editProduct = this.editProduct.bind(this);
   }
   componentDidMount(){
-    axios.get(`https://kalpatharu-backend.herokuapp.com/show`).then((result)=>{
-      
-      this.setState({
-        products:result.data
-      })
-      //console.log(this.state.products)
+    axios.get(`http://localhost:2018/show`).then((result)=>{
+      console.log('show result',result)
+      if(result.status == 200)
+      { 
 
+        this.setState({products:result.data, loading: false}) 
+      }
+      else{
+          this.setState({err:true, loading:false});
+        }
     })
   }
   editProduct(id){
@@ -29,11 +37,17 @@ class Products extends Component {
   }
   deleteProduct(val,e){
     console.log(val,e)
-    axios.post('https://kalpatharu-backend.herokuapp.com/deleteProduct',val).then((result)=>{
+    axios.post('http://localhost:2018/deleteProduct',val).then((result)=>{
       console.log(result)
-      this.setState({
-        products:result.data.products
-      })
+      if(result.status == 200)
+      {
+        this.setState({products:result.data})
+      }
+      else{
+        this.setState({err:true});
+      }
+      
+        
     })
   }
   constructProduct(){
@@ -53,12 +67,19 @@ class Products extends Component {
     return products;
   }
   render() {
-    if(this.state.products.length > 0)
+    const override = css`
+    display: block;
+    margin: 0 auto;
+    border-color: red;
+`;
+    if(this.state.products.length > 0 && !this.state.loading)
     {
       return (
         <div className="animated fadeIn">
          
-  
+         <Alert color="danger" isOpen={this.state.err}>
+         There is some error occured in server...Sorry for that
+      </Alert>
           <Row>
             <Col>
               <Card>
@@ -103,13 +124,30 @@ class Products extends Component {
       );
       
     }
-    else{
+    else if(this.state.products.length == 0 && !this.state.loading){
       return (
         <div className="animated fadeIn">
+        <Alert color="danger" isOpen={this.state.err}>
+         There is some error occured in server...Sorry for that
+      </Alert>
           <Row>
             <h1>No Products Found</h1>
             </Row>
         </div>
+      )
+    }
+    else if(this.state.loading)
+    {
+      return (
+      <div className="animated fadeIn">
+       <HashLoader
+          css={override}
+          sizeUnit={"px"}
+          size={150}
+          color={'#123abc'}
+          loading={this.state.loading}
+        /> 
+      </div>
       )
     }
    

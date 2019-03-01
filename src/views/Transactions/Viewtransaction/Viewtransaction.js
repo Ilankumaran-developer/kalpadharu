@@ -1,6 +1,8 @@
 import React, { Component } from 'react';
-import { Button,Badge, Card, CardBody, CardHeader, Col, Pagination, PaginationItem, PaginationLink, Row, Table } from 'reactstrap';
+import { Alert, Button,Badge, Card, CardBody, CardHeader, Col, Pagination, PaginationItem, PaginationLink, Row, Table } from 'reactstrap';
 import axios from 'axios';
+import {HashLoader} from 'react-spinners';
+import {css} from '@emotion/core';
 
 class Products extends Component {
   constructor(props)
@@ -8,7 +10,9 @@ class Products extends Component {
     super(props);
     this.state={
       transactions:[],
-      currentpage:0 
+      currentpage:0,
+      err:false,
+      loading:true
     }
     this.constructHistory = this.constructHistory.bind(this);
     this.deleteTransaction = this.deleteTransaction.bind(this);
@@ -16,11 +20,19 @@ class Products extends Component {
     this.viewInvoice  = this.viewInvoice.bind(this);
   }
   componentDidMount(){
-    axios.get(`https://kalpatharu-backend.herokuapp.com/showtransactions`).then((result)=>{
+    axios.get(`http://localhost:2018/showtransactions`).then((result)=>{
       console.log(result)
-      this.setState({
-        transactions:result.data
-      })
+      if(result.status == 200)
+      {
+        this.setState({
+          transactions:result.data,
+          loading:false
+        })
+      }
+      else{
+        this.setState({err:true,loading:false});
+      }
+    
       //console.log(this.state.products)
 
     })
@@ -59,7 +71,13 @@ class Products extends Component {
     return transactions;
   }
   render() {
-    if(this.state.transactions.length > 0)
+    const override = css`
+    display: block;
+    margin: 0 auto;
+    border-color: red;
+    `;
+
+    if(this.state.transactions.length > 0 && !this.state.loading)
     {
       return (
         <div className="animated fadeIn">
@@ -68,6 +86,9 @@ class Products extends Component {
           <Row>
             <Col>
               <Card>
+              <Alert color="danger" isOpen={this.state.err}>
+         There is some error occured in server...Sorry for that
+      </Alert>
                 <CardHeader>
                   <i className="fa fa-align-justify"></i>Products List
                 </CardHeader>
@@ -112,12 +133,26 @@ class Products extends Component {
       );
       
     }
-    else{
+    else if(this.state.transactions.length == 0 && !this.state.loading){
       return (
         <div className="animated fadeIn">
           <Row>
             <h1>No Transactions Found</h1>
             </Row>
+        </div>
+      )
+    }
+    else if(this.state.loading){
+      return(
+        <div className="animated fadeIn">
+        <HashLoader
+          css={override}
+          sizeUnit={"px"}
+          size={150}
+          color={'#123abc'}
+          loading={this.state.loading}
+        /> 
+    
         </div>
       )
     }
