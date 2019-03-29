@@ -1,0 +1,7 @@
+{
+    "name": "AddInventory",
+    "version": "0.0.0",
+    "private": true,
+    "main": "./AddInventory.js"
+}
+  

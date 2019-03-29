@@ -466,7 +466,7 @@ class Dashboard extends Component {
     this.state = {
       dropdownOpen: false,
       radioSelected: 2,
-      transCount:0,
+      ordersCount:0,
       prodCount:0,
       err:false
     };
@@ -483,6 +483,15 @@ class Dashboard extends Component {
        
       //console.log(this.state.products)
 
+    })
+    axios.get(`http://localhost:2018/showorders`).then((result)=>{
+      console.log(result);
+      if(result.status == 200){
+        this.setState({ordersCount:result.data.length})
+      }
+      else{
+        this.setState({err:true});
+      }
     })
   }
 
@@ -547,8 +556,8 @@ class Dashboard extends Component {
                   </DropdownMenu>*/}
                   </Dropdown> 
                 </ButtonGroup>
-                <div className="text-value">{this.state.transCount}</div>
-                <div>Total Transactions</div>
+                <div className="text-value">{this.state.ordersCount}</div>
+                <div>Total Orders</div>
               </CardBody>
               <div className="chart-wrapper mx-3" style={{ height: '70px' }}>
                 <Line data={cardChartData1} options={cardChartOpts1} height={70} />

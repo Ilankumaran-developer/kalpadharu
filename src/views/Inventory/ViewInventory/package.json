@@ -1,0 +1,7 @@
+{
+    "name": "ViewInventory",
+    "version": "0.0.0",
+    "private": true,
+    "main": "./ViewInventory.js"
+  }
+  

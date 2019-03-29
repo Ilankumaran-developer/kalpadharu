@@ -5,7 +5,7 @@ import { Alert } from 'reactstrap';
 import {HashLoader} from 'react-spinners';
 import { css } from '@emotion/core';
 
-class Products extends Component {
+class Inventory extends Component {
   constructor(props)
   {
     super(props);
@@ -15,12 +15,14 @@ class Products extends Component {
       err:false,
       loading:true
     }
-    this.constructProduct = this.constructProduct.bind(this);
+    this.constructInventory = this.constructInventory.bind(this);
     this.deleteProduct = this.deleteProduct.bind(this);
-    this.editProduct = this.editProduct.bind(this);
+    this.editInventory = this.editInventory.bind(this);
   }
+  
   componentDidMount(){
-    axios.get(`http://localhost:2018/show`).then((result)=>{
+      try{
+        axios.get(`http://localhost:2018/list/Inventory`).then((result)=>{
       console.log('show result',result)
       if(result.status == 200)
       { 
@@ -31,9 +33,13 @@ class Products extends Component {
           this.setState({err:true, loading:false});
         }
     })
+      } catch(e){
+          console.log(e)
+      }
+    
   }
-  editProduct(id){
-    this.props.history.push('/edit/product/'+id)
+  editInventory(id){
+    this.props.history.push('/add/inventory')
   }
   deleteProduct(val,e){
     console.log(val,e)
@@ -50,20 +56,17 @@ class Products extends Component {
         
     })
   }
-  constructProduct(){
+  constructInventory(){
     let products = []
     let clone = this.state.products
     for(var i  in clone)
     {
       let temp = []
-      temp.push(<td>{clone[i].productname}</td>)
       temp.push(<td>{clone[i].sku}</td>)
+      temp.push(<td>{clone[i].quantity}</td>)
+      temp.push(<td>{clone[i].total_sales}</td>)
       temp.push(<td>{clone[i].status}</td>)
-      temp.push(<td>{clone[i].date_created}</td>)
-      temp.push(<td>{clone[i].cost_price}</td>)
-      temp.push(<td>{clone[i].selling_price}</td>)
-      temp.push(<td><Button onClick={this.editProduct.bind(this,clone[i]._id)}  color="info">Edit</Button></td>)
-      temp.push(<td><Button onClick={this.deleteProduct.bind(this,clone[i])} color="danger">Delete</Button></td>)
+      temp.push(<td><Button onClick={this.editInventory.bind(this,clone[i]._id)}  color="info">Edit</Button></td>)
       products.push(<tr>{temp}</tr>)
     }
     return products;
@@ -86,24 +89,21 @@ class Products extends Component {
             <Col>
               <Card>
                 <CardHeader>
-                  <i className="fa fa-align-justify"></i>Products List
+                  <i className="fa fa-align-justify"></i>Inventory List
                 </CardHeader>
                 <CardBody>
                   <Table hover bordered striped responsive size="sm">
                     <thead>
                     <tr>
-                      <th>Product Name</th>
                       <th>SKU</th>
-                      <th>status</th>
-                      <th>Date Added</th>
-                      <th>Cost price (per kg)</th>
-                      <th>Selling Price (per kg)</th>
-                      <th>Action</th>
+                      <th>Quantity</th>
+                      <th>Total sales</th>
                       <th>Status</th>
+                      <th>Edit</th>
                     </tr>
                     </thead>
                     <tbody>
-                    {this.constructProduct()}
+                    {this.constructInventory()}
                     
                     </tbody>
                   </Table>
@@ -135,7 +135,7 @@ class Products extends Component {
          There is some error occured in server...Sorry for that
       </Alert>
           <Row>
-            <h1>No Products Found</h1>
+            <h1>No Inventory Found</h1>
             </Row>
         </div>
       )
@@ -158,4 +158,4 @@ class Products extends Component {
   }
 }
 
-export default Products;
+export default Inventory;

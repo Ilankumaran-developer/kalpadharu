@@ -61,6 +61,7 @@ class Forms extends Component {
     payload.cost_price = this.state.cost_price;
     payload.selling_price = this.state.percentage;
     payload.min_unit = this.state.min_unit;
+    payload.status = "out_of_stock";
     axios.post(`http://localhost:2018/save`,payload).then((result)=>{
       console.log(result)
       if(result.status == 200)

@@ -44,7 +44,7 @@ class Forms extends Component {
             fadeIn: true,
             timeout: 300,
             products: [],
-            transaction: [],
+            line_items: [],
             product_id: '',
             unit_price: 0,
             selling_price_per_kg: 0,
@@ -61,11 +61,11 @@ class Forms extends Component {
     }
     componentDidMount() {
 
-        axios.post(`http://localhost:2018/showtransbyid`, { id: this.state.id }).then((result) => {
+        axios.post(`http://localhost:2018/showordersbyid`, { id: this.state.id }).then((result) => {
             console.log(result.data)
             if(result.status == 200)
             {
-                this.setState({ transaction: result.data.transaction })
+                this.setState({ line_items: result.data.line_items })
                 this.setState({ grand_total: result.data.grand_total })
                 this.setState({ service_charge: result.data.service_tax })
                 this.setState({ user: result.data.user })
@@ -167,7 +167,7 @@ class Forms extends Component {
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        {this.state.transaction.map((item, i) => {
+                                        {this.state.line_items.map((item, i) => {
                                             return [
                                                 <tr>
                                                     <td>{item.product_name}</td>

@@ -8,30 +8,32 @@ import {Alert} from 'reactstrap';
 class Invoice extends Component {
     constructor(props) {
         super(props);
-        this.constructTransation = this.constructTransation.bind(this)
+        this.constructOrder = this.constructOrder.bind(this)
         this.state = {
             id: this.props.match.params.id,
-            transaction : [],
+            line_items : [],
             user:'',
             date_created:'',
             ids : [],
             subtotal:'',
             products:[],
+            order_id:'',
             err:false
         }
     }
     componentDidMount() {
-        axios.post(`http://localhost:2018/showtransbyid`, { id: this.state.id }).then((result) => {
+        axios.post(`http://localhost:2018/showordersbyid`, { id: this.state.id }).then((result) => {
             console.log(result.data)
             if(result.status == 200){
-                this.setState({transaction:result.data.transaction})
+                this.setState({line_items:result.data.line_items})
             this.setState({user:result.data.user})
             this.setState({date_created:result.data.date_created})
             this.setState({ids:result.data.product_ids})
             this.setState({subtotal:result.data.total})
             this.setState({service_tax:result.data.service_tax})
             this.setState({grand_total:result.data.grand_total})
-            axios.post(`http://localhost:2018/getProdDetails`,{ids:this.state.ids}).then((result1)=>{
+            this.setState({order_id:result.data.order_id})
+            /* axios.post(`http://localhost:2018/getProdDetails`,{ids:this.state.ids}).then((result1)=>{
                 if(result1.status == 200)
                 {
                     console.log(result1)
@@ -41,7 +43,7 @@ class Invoice extends Component {
                     this.setState({err:true});
                 }
                 
-            })
+            }) */
             }
             else{
                 this.setState({err: true});
@@ -51,27 +53,24 @@ class Invoice extends Component {
         })
         
     }
-    constructTransation(event){
-        let clone = this.state.products;
-        let trans = this.state.transaction;
-        let transactions = []
-        for(var i  in clone)
-        {
-          let temp = []
-          temp.push(<td>{clone[i].productname}</td>)
-          temp.push(<td>{clone[i].selling_price}</td>)
-          for(let j in trans)
+    constructOrder(){
+        
+         let line_item_product = this.state.line_items;
+        let line_items = []
+       
+         
+          console.log()
+          for(let i = 0; i <  line_item_product.length ; i++)
           {
-              if(trans[j].product_id == clone[i]._id)
-              {
-                  temp.push(<td>{trans[j].unit}</td>)
-                  temp.push(<td>{trans[j].selling_price}</td>)
-              }
-          }
-          
-          transactions.push(<tr>{temp}</tr>)
-        }
-        return transactions
+            let temp = [];
+              console.log(i, line_item_product[i])
+                  temp.push(<td>{line_item_product[i].product_name}</td>)
+                  temp.push(<td>{parseFloat(line_item_product[i].sku_min_sp)} per ({parseFloat(line_item_product[i].sku_min_unit) * 1000}) grams</td>)
+                  temp.push(<td>{parseFloat(line_item_product[i].unit) * 1000} grams</td>)
+                  temp.push(<td>{parseFloat(line_item_product[i].selling_price).toFixed(2)}</td>)
+                  line_items.push(<tr>{temp}</tr>)
+            }
+        return line_items 
     }
     render() {
         return (
@@ -83,7 +82,7 @@ class Invoice extends Component {
                     <Row>
                         <Col xs="12" md="6">
                             <div className="invoice-title">
-                                <h2>Invoice</h2><h3 className="pull-right">Order # {this.state.id}</h3>
+                                <h2>Invoice</h2><h3 className="pull-right">Order # {this.state.order_id}</h3>
                             </div>
                             <hr />
                             <div className="row">
@@ -120,7 +119,7 @@ class Invoice extends Component {
                                                 </tr>
                                             </thead>
                                             <tbody>
-                                            {this.constructTransation()}
+                                            {this.constructOrder()}
                                                 <tr>
                                                     <td className="thick-line"></td>
                                                     <td className="thick-line"></td>

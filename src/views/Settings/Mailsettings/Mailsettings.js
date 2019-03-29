@@ -33,52 +33,82 @@ class Forms extends Component {
 
     this.toggle = this.toggle.bind(this);
     this.toggleFade = this.toggleFade.bind(this);
-    this.addproduct = this.addproduct.bind(this);
-    this.namechange = this.namechange.bind(this);
-    this.descriptionchange = this.descriptionchange.bind(this);
-    this.costpricechange = this.costpricechange.bind(this);
-    this.percentagechange = this.percentagechange.bind(this)
+    this.fromAddressChange = this.fromAddressChange.bind(this);
+    this.serviceNameChange = this.serviceNameChange.bind(this);
+    this.hostChange = this.hostChange.bind(this);
+    this.usernameChange = this.usernameChange.bind(this)
+    this.passwordChange = this.passwordChange.bind(this)
+    this.addmailsettings = this.addmailsettings.bind(this);
     this.state = {
       collapse: true,
       fadeIn: true,
       timeout: 300,
-      name:'',
-      description:'',
-      cost_price:0.00,
-      percentage:0
+      fromAddress:'',
+      service_name:'',
+      host_name:'',
+      user_name:'',
+      password: ''
     };
   }
-  addproduct(event){
-    event.preventDefault();
-    console.log(this.state)
-    let payload = {}
-    payload.productname = this.state.name;
-    payload.description = this.state.description;
-    payload.cost_price = this.state.cost_price;
-    payload.selling_price = this.state.percentage;
-    axios.post(`http://localhost:2018/save`,payload).then((result)=>{
+  componentDidMount()
+  {
+    axios.get('http://localhost:2018/getConfig').then((result)=>{
       console.log(result)
       if(result.status == 200)
       {
-        this.props.history.push('/list/products')
+        if(result.data.length > 0)
+        {
+          let data = result.data[result.data.length-1]
+          this.setState({
+          fromAddress: data.from,
+          service_name : data.service,
+          host_name : data.host,
+          user_name : data.username,
+          password : data.password
+        })
+        }
+        else{
+          this.setState({
+            fromAddress:result.data.from,
+            service_name : result.data.service,
+            host_name : result.data.host,
+            user_name : result.data.username,
+            password : result.data.password
+          })
+        }
+        
       }
-      else{
-        this.setState({err:true});
-      }
-      console.log(result)
     })
   }
-  namechange(event){
-    this.setState({name:event.target.value})
+ 
+  fromAddressChange(event){
+    this.setState({fromAddress:event.target.value})
   }
-  descriptionchange(event){
-    this.setState({description:event.target.value})
+  serviceNameChange(event){
+    this.setState({service_name:event.target.value})
   }
-  costpricechange(event){
-    this.setState({cost_price: event.target.value})
+  hostChange(event){
+    this.setState({host_name: event.target.value})
   }
-  percentagechange(event){
-    this.setState({percentage: event.target.value})
+  usernameChange(event){
+    this.setState({user_name: event.target.value})
+  }
+  passwordChange(event){
+    this.setState({password: event.target.value})
+  }
+  addmailsettings(event){
+    event.preventDefault();
+    let payload = {};
+    payload.from = this.state.fromAddress;
+    payload.service = this.state.service_name;
+    payload.host = this.state.host_name;
+    payload.username = this.state.user_name;
+    payload.password = this.state.password;
+    console.log(payload);
+    axios.post('http://localhost:2018/saveMailsettings',payload).then((result)=>{
+      
+      console.log(result)
+    })
   }
 
 
@@ -105,55 +135,52 @@ class Forms extends Component {
                   
                   <FormGroup row>
                     <Col md="3">
-                      <Label htmlFor="text-input">Name of the product</Label>
+                      <Label htmlFor="text-input">From Mail</Label>
                     </Col>
                     <Col xs="12" md="9">
-                      <Input type="text" value={this.state.name} onChange={this.namechange} id="text-input" name="text-input" placeholder="Product Name" />
-                      <FormText color="muted">Enter the name of the product</FormText>
+                      <Input type="text" value={this.state.fromAddress} onChange={this.fromAddressChange} id="text-input" name="text-input" placeholder="From Mail" />
+                      <FormText color="muted">Ex: ilan@gmail.com</FormText>
                     </Col>
                   </FormGroup>
                                    
                   <FormGroup row>
                     <Col md="3">
-                      <Label htmlFor="textarea-input">Description</Label>
+                      <Label htmlFor="textarea-input">Service Name</Label>
                     </Col>
                     <Col xs="12" md="9">
-                      <Input type="textarea" name="textarea-input" value={this.state.description} onChange={this.descriptionchange} id="textarea-input" rows="9"
-                             placeholder="Description of the product" />
+                    <Input type="text" value={this.state.service_name} onChange={this.serviceNameChange} id="text-input" name="text-input" placeholder="Service Name" />
+                    <FormText color="muted">Ex: gmail</FormText>
                     </Col>
                   </FormGroup>
                   <FormGroup row>
                     <Col md="3">
-                      <Label htmlFor="text-input">Cost price of the product</Label>
+                      <Label htmlFor="text-input">Host</Label>
                     </Col>
                     <Col xs="12" md="9">
-                      <Input type="number" id="text-input" name="text-input" value={this.state.cost_price} onChange={this.costpricechange} placeholder="Cost Price" />
-                      <FormText color="muted">Enter the cost price of the product</FormText>
+                    <Input type="text" value={this.state.host_name} onChange={this.hostChange} id="text-input" name="text-input" placeholder="host name" />
+                      <FormText color="muted">Ex: smtp.gmail.com</FormText>
                     </Col>
                   </FormGroup>
-                  
-                  
-                  <FormGroup>
-                        <Label htmlFor="appendedPrependedInput">Selling Price of the product</Label>
-                        <div className="controls">
-                          <InputGroup className="input-prepend">
-                           
-                            <Input  id="appendedPrependedInput" size="16" type="number" value={this.state.percentage} onChange={this.percentagechange} />
-                            
-                          </InputGroup>
-                        </div>
-                      </FormGroup>
-                  <FormGroup row hidden>
+                  <FormGroup row>
                     <Col md="3">
-                      <Label className="custom-file" htmlFor="custom-file-input">Custom file input</Label>
+                      <Label htmlFor="text-input">Username</Label>
                     </Col>
                     <Col xs="12" md="9">
-                      <Label className="custom-file">
-                        <Input className="custom-file" type="file" id="custom-file-input" name="file-input" />
-                        <span className="custom-file-control"></span>
-                      </Label>
+                    <Input type="text" value={this.state.user_name} onChange={this.usernameChange} id="text-input" name="text-input" placeholder="Username" />
+                      <FormText color="muted">Ex: ilan@gmail.com</FormText>
                     </Col>
                   </FormGroup>
+                  <FormGroup row>
+                    <Col md="3">
+                      <Label htmlFor="text-input">Password</Label>
+                    </Col>
+                    <Col xs="12" md="9">
+                    <Input type="password" value={this.state.password} onChange={this.passwordChange} id="text-input" name="text-input" placeholder="Password" />
+
+                    </Col>
+                  </FormGroup>
+                  
+               
                   
               <CardFooter>
                         <Button type="submit" color="primary">Submit</Button>

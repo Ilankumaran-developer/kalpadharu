@@ -30,7 +30,7 @@ export default {
     },
     {
       title: true,
-      name: 'Transactions',
+      name: 'Inventory',
       wrapper: {            // optional wrapper object
         element: '',        // required valid HTML5 element tag
         attributes: {}        // optional valid JS object with JS API naming ex: { className: "my-class", style: { fontFamily: "Verdana" }, id: "my-id"}
@@ -38,13 +38,32 @@ export default {
       class: ''             // optional class names space delimited list for title item ex: "text-center"
     },
     {
-      name: 'Genertate a new bill',
-      url: '/add/transaction',
+      name: 'List Inventory',
+      url: '/view/inventory',
+      icon: 'icon-list',
+    },
+    {
+      name: 'Add or Edit Inventory',
+      url: '/add/inventory',
       icon: 'icon-plus',
     },
     {
-      name: 'History of transactions',
-      url: '/list/transactions',
+      title: true,
+      name: 'Orders',
+      wrapper: {            // optional wrapper object
+        element: '',        // required valid HTML5 element tag
+        attributes: {}        // optional valid JS object with JS API naming ex: { className: "my-class", style: { fontFamily: "Verdana" }, id: "my-id"}
+      },
+      class: ''             // optional class names space delimited list for title item ex: "text-center"
+    },
+    {
+      name: 'Place a new order',
+      url: '/add/order',
+      icon: 'icon-plus',
+    },
+    {
+      name: 'History of orders',
+      url: '/list/orders',
       icon: 'icon-list',
     },
     {

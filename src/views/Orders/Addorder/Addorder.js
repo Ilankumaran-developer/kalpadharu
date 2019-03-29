@@ -45,6 +45,7 @@ class Forms extends Component {
     this.generateBill = this.generateBill.bind(this);
     this.userchange = this.userchange.bind(this);
     this.service_charge_change = this.service_charge_change.bind(this)
+    this.statusChange = this.statusChange.bind(this);
     this.onDismiss = this.onDismiss.bind(this);
    // this.removeitem = this.removeitem.bind(this)
     
@@ -55,7 +56,7 @@ class Forms extends Component {
       fadeIn: true,
       timeout: 300,
      products:[],
-     transaction:[],
+     line_items:[],
      product_id:'',
      unit_price:0,
      selling_price_per_kg:0,
@@ -67,19 +68,28 @@ class Forms extends Component {
      cost_price:0,
      alert:false,
      err:false,
-     loading:true
+     loading:true,
+     min_unit:0,
+     status:"Accepted",
+     sku:"",
+     min_unit_sp:0
     };
   }
   componentDidMount(){
-    axios.get(`http://localhost:2018/show`).then((result)=>{
-      console.log(result)
-      if(result.status == 200)
-      {
-        this.setState({products:result.data,loading:false})
-      }
-      else{
+    axios.get(`http://localhost:2018/show?status=in_stock`).then((result)=>{
+      console.log('resulttttt',result)
+      if(result.data.length != 0){
+        if(result.status == 200 && result.data.length != 0)
+        {
+          this.setState({products:result.data,loading:false})
+        }
+        else{
+          this.setState({err:true,loading:false});
+        } 
+      }else{
         this.setState({err:true,loading:false});
       }
+      
       
       //console.log(this.state.products)
 
@@ -103,16 +113,28 @@ class Forms extends Component {
   removeitem(index){
     console.log(index)
     let temp = [];
-    temp = this.state.transaction;
-    delete temp[index];
+    for(let i in this.state.line_items){
+      if(i != index)
+      temp.push(this.state.line_items[i])
+    }
     this.setState({
-      transaction:temp
+      line_items:temp
     })
   }
   addproduct(event){
     event.preventDefault();
-    let temp = [];
-    temp = this.state.transaction;
+    axios.get(`http://localhost:2018/get/Inventory?sku=${this.state.sku}`).then((result)=>{
+    console.log('inventoey detrails', result)
+    let remainingCount = 0, lineItemhitCount = 0;
+    for(let i in this.state.line_items){
+        if(this.state.line_items[i].sku == this.state.sku)
+        {
+          lineItemhitCount = lineItemhitCount + 1;
+        }
+    }
+    if(parseInt(result.data[0].quantity) - lineItemhitCount > 0){
+      let temp = [];
+    temp = this.state.line_items;
     let profit  = parseFloat(this.state.selling_price) - parseFloat(this.state.cost_price);
     temp.push({
         product_name : this.state.productname,
@@ -120,21 +142,32 @@ class Forms extends Component {
         selling_price:this.state.selling_price,
         cost_price:this.state.cost_price,
         profit:profit,
-        product_id:this.state.product_id
+        product_id:this.state.product_id,
+        sku : this.state.sku,
+        line_item_status : this.state.status,
+        sku_min_unit : this.state.min_unit,
+        sku_min_sp : this.state.min_unit_sp
     })
     
-    this.setState({transaction:temp})
-  this.setState({product_id:''})
+    this.setState({line_items:temp});
   this.setState({unit_price:0})
   this.setState({selling_price:0});
   this.setState({cost_price:0});
   let tot = 0;
-  for(let i in this.state.transaction)
+  for(let i in this.state.line_items)
   {
-    tot = parseFloat(tot) + parseFloat(this.state.transaction[i].selling_price)
+    tot = parseFloat(tot) + parseFloat(this.state.line_items[i].selling_price)
   }
   tot = parseFloat(tot).toFixed(2)
     this.setState({grand_total:tot})
+  
+    }
+    else{
+      alert("SKU not available in inventory");
+    }
+  })
+    
+    
   }
   unitchange(event)
   {
@@ -142,8 +175,10 @@ class Forms extends Component {
       this.setState({
         unit_price : event.target.value
       })
-      console.log(this.state.selling_price_per_kg)
-      let sp = this.state.selling_price_per_kg * parseFloat(event.target.value) 
+     
+      console.log(this.state.selling_price_per_kg,event.target.value);
+      let sp = this.state.selling_price_per_kg * parseFloat(event.target.value * 1000) 
+      console.log(sp)
       this.setState({
           selling_price: sp
       })
@@ -155,12 +190,18 @@ class Forms extends Component {
     {
         if(this.state.products[i]._id == event.target.value)
         {
-            this.setState({selling_price_per_kg:this.state.products[i].selling_price})
+            this.setState({selling_price_per_kg:this.state.products[i].price_per_gram})
             this.setState({cost_price:this.state.products[i].cost_price});
-            this.setState({productname:this.state.products[i].productname})
+            this.setState({productname:this.state.products[i].productname});
+            this.setState({sku:this.state.products[i].sku});
+            this.setState({min_unit : this.state.products[i].min_unit});
+            this.setState({min_unit_sp : this.state.products[i].selliong_price});
         }
     }
     this.setState({product_id:event.target.value})
+    }
+    statusChange(event){
+      this.setState({status: event.target.value})
     }
     userchange(event){
       this.setState({user:event.target.value})
@@ -168,26 +209,29 @@ class Forms extends Component {
     generateBill(event)
     {
       event.preventDefault();
-      
+      this.setState({loading: true})
       let payload ={};
       payload.user = this.state.user;
-      payload.transaction = this.state.transaction;
+      payload.line_items = this.state.line_items;
       payload.service_tax = parseFloat(this.state.service_charge).toFixed(2);
       payload.total = parseFloat(this.state.grand_total) - parseFloat(this.state.service_charge);
       let totprofit = 0;
       payload.product_ids = [];
-      for(let i in this.state.transaction)
+      for(let i in this.state.line_items)
       {
-        totprofit = parseFloat(totprofit) + parseFloat(this.state.transaction[i].profit)
-        payload.product_ids.push(this.state.transaction[i].product_id)
+        totprofit = parseFloat(totprofit) + parseFloat(this.state.line_items[i].profit)
+        payload.product_ids.push(this.state.line_items[i].product_id)
 
       }
       payload.profit = totprofit;
+      payload.status = this.state.status;
       payload.grand_total = parseFloat(this.state.grand_total).toFixed(2);
       console.log(payload)
-      axios.post('http://localhost:2018/saveTransaction',payload).then((result)=>{
+      axios.post('http://localhost:2018/saveOrder',payload).then((result)=>{
+        this.setState({loading: false})
         if(result.status == 200){
           this.setState({alert:true})
+          this.props.history.push('/list/orders')
         }
         else{
           this.setState({err:true})
@@ -201,9 +245,9 @@ class Forms extends Component {
       {
         this.setState({service_charge:event.target.value})
         let grtot = 0;
-        for(let i in this.state.transaction)
+        for(let i in this.state.line_items)
         {
-          grtot = parseFloat(grtot) + parseFloat(this.state.transaction[i].selling_price)
+          grtot = parseFloat(grtot) + parseFloat(this.state.line_items[i].selling_price)
         }
         grtot = parseFloat(grtot) + parseFloat(event.target.value)
         grtot = parseFloat(grtot).toFixed(2);
@@ -241,7 +285,7 @@ class Forms extends Component {
           <Col xs="12" md="6">
             <Card>
               <CardHeader>
-                <strong>Add a new line item into transaction</strong>
+                <strong>Add a new line item into Order</strong>
               </CardHeader>
               <CardBody>
                 <Form  onSubmit={this.addproduct}  encType="multipart/form-data" className="form-horizontal">
@@ -264,18 +308,39 @@ class Forms extends Component {
                       <Label htmlFor="text-input">Unit (kg/l)</Label>
                     </Col>
                     <Col xs="12" md="9">
-                      <Input type="number"  id="text-input" name="text-input" value={this.state.unit_price} onChange={this.unitchange} placeholder="Unit" />
+                      <Input type="number" min={this.state.min_unit} id="text-input" name="text-input" step="0.1" value={this.state.unit_price} onChange={this.unitchange} placeholder="Unit" />
                       <FormText color="muted">Select the number of kg or litre</FormText>
+                    </Col>
+                  </FormGroup>
+
+
+                  <FormGroup row>
+                    <Col md="3">
+                      <Label htmlFor="text-input">Selling Price</Label>
+                    </Col>
+                    <Col xs="12" md="9">
+                    <Label htmlFor="text-input">{this.state.selling_price}</Label>
                     </Col>
                   </FormGroup>
                   
                   
-                  <FormGroup>
-                        <Label htmlFor="appendedPrependedInput">Selling Price of the product</Label>
-                        <div className="controls">
-                            <span>{this.state.selling_price}</span>
-                        </div>
-                      </FormGroup>
+                 
+
+                      <FormGroup row>
+                    <Col md="3">
+                      <Label htmlFor="text-input">Status</Label>
+                    </Col>
+                    <Col xs="12" md="9" size="lg">
+                      <Input onChange={this.statusChange} type="select" name="selectLg" id="selectLg" bsSize="lg">
+                        
+                        <option value="Accepted">Accepted</option>
+                        <option value="PO_submitted">PO_submitted</option>
+                        <option value="Shipped">Shipped</option>
+                        <option value="Delivered">Delivered</option>
+                        
+                      </Input>
+                    </Col>
+                  </FormGroup>
                   
                   
               <CardFooter>
@@ -335,7 +400,7 @@ class Forms extends Component {
                         
                       </CardFooter>
                       <Alert color="info" isOpen={this.state.alert} toggle={this.onDismiss}>
-                  Transaction successfully saved!
+                  Order successfully placed!
                 </Alert>
                 </Form>
               </CardBody>
@@ -361,7 +426,7 @@ class Forms extends Component {
                     </tr>
                     </thead>
                     <tbody>
-                    {this.state.transaction.map((item,i)=>{
+                    {this.state.line_items.map((item,i)=>{
                       return[
                         <tr>
                           <td>{item.product_name}</td>
@@ -394,6 +459,13 @@ class Forms extends Component {
                           color={'#123abc'}
                           loading={this.state.loading}
                         /> 
+                      </div>
+                      )
+                  }
+                  else if(!this.state.loading){
+                    return (
+                      <div className="animated fadeIn">
+                        <h3>Hey buddy, It seems there are no product is in IN STOCK status, Can you fill them in inventory and get back here ??...Sorry for Inconvenience</h3>
                       </div>
                       )
                   }

@@ -198,29 +198,37 @@ const EditProduct = Loadable({
   loading: Loading,
 })
 
-const AddTransaction = Loadable({
-  loader: () => import('./views/Transactions/Addtransaction/Addtransaction'),
+const AddOrder = Loadable({
+  loader: () => import('./views/Orders/Addorder/Addorder'),
   loading: Loading
 })
 
-const ListTransactions = Loadable({
-  loader: () => import('./views/Transactions/Viewtransaction/Viewtransaction'),
+const ListOrders = Loadable({
+  loader: () => import('./views/Orders/Vieworder/Vieworder'),
   loading: Loading
 })
 
-const EditTransaction = Loadable({
-  loader: () => import('./views/Transactions/Addtransaction/Edittransaction'),
+const EditOrder = Loadable({
+  loader: () => import('./views/Orders/Addorder/Editorder'),
   loading: Loading
 })
 
 const ViewInvoice = Loadable({
-  loader: () => import('./views/Transactions/Addtransaction/ViewInvoice'),
+  loader: () => import('./views/Orders/Addorder/ViewInvoice'),
   loading: Loading
 })
 
 const AddSetting = Loadable({
   loader: () => import('./views/Settings/Mailsettings/Mailsettings'),
   loading: Loading
+})
+const ListInventory  = Loadable({
+  loader: () => import('./views/Inventory/ViewInventory/ViewInventory'),
+  loading: Loading
+})
+const AddInventory = Loadable({
+  loader: () => import('./views/Inventory/AddInventory/AddInventory'),
+  loading : Loading
 })
 
 // https://github.com/ReactTraining/react-router/tree/master/packages/react-router-config
@@ -269,9 +277,11 @@ const routes = [
   { path: '/users', exact: true,  name: 'Users', component: Users },
   { path: '/users/:id', exact: true, name: 'User Details', component: User },
   { path: '/edit/product/:id',exact: true, name:'Product Details', component: EditProduct },
-  { path: '/add/transaction', exact: true, name:'Add Transaction', component: AddTransaction},
-  { path: '/list/transactions', exact: true, name:'List Transaction', component: ListTransactions},
-  { path: '/edit/transaction/:id',exact: true, name:'View Transaction Detals', component: EditTransaction },
+  { path: '/add/order', exact: true, name:'Add Order', component: AddOrder},
+  { path: '/list/orders', exact: true, name:'List Orders', component: ListOrders},
+  { path: '/view/inventory', exact: true, name:'Inventory List', component: ListInventory},
+  { path: '/add/inventory', exact: true, name:'Add or Edit Inventory', component: AddInventory},
+  { path: '/edit/order/:id',exact: true, name:'View Order Detals', component: EditOrder },
   { path: '/view/Invoice/:id', exact:true, name:'View Invoice',component: ViewInvoice},
   { path: '/settings/mail', exact:true, name:'eMail Settings',component: AddSetting },
 
