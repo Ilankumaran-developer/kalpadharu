@@ -1,9 +1,10 @@
 import React, { Component } from 'react';
-import { Button,Badge, Card, CardBody, CardHeader, Col, Pagination, PaginationItem, PaginationLink, Row, Table } from 'reactstrap';
+import { Button,Badge, Card, CardBody, CardHeader, Col,  Row, Table } from 'reactstrap';
 import axios from 'axios';
 import { Alert } from 'reactstrap';
 import {HashLoader} from 'react-spinners';
 import { css } from '@emotion/core';
+import Pagination from '../../common/Pagination/pagination';
 
 class Inventory extends Component {
   constructor(props)
@@ -13,12 +14,18 @@ class Inventory extends Component {
       products:[],
       currentpage:0 ,
       err:false,
-      loading:true
+      loading:true,
+      pageOfItems : []
     }
     this.constructInventory = this.constructInventory.bind(this);
     this.deleteProduct = this.deleteProduct.bind(this);
     this.editInventory = this.editInventory.bind(this);
+    this.onChangePage = this.onChangePage.bind(this);
   }
+  onChangePage(pageOfItems) {
+    // update state with new page of items
+    this.setState({ pageOfItems: pageOfItems });
+}
   
   componentDidMount(){
       try{
@@ -58,7 +65,7 @@ class Inventory extends Component {
   }
   constructInventory(){
     let products = []
-    let clone = this.state.products
+    let clone = this.state.pageOfItems;
     for(var i  in clone)
     {
       let temp = []
@@ -108,16 +115,7 @@ class Inventory extends Component {
                     </tbody>
                   </Table>
                   <nav>
-                    <Pagination>
-                      <PaginationItem><PaginationLink previous tag="button">Prev</PaginationLink></PaginationItem>
-                      <PaginationItem active>
-                        <PaginationLink tag="button">1</PaginationLink>
-                      </PaginationItem>
-                      <PaginationItem><PaginationLink tag="button">2</PaginationLink></PaginationItem>
-                      <PaginationItem><PaginationLink tag="button">3</PaginationLink></PaginationItem>
-                      <PaginationItem><PaginationLink tag="button">4</PaginationLink></PaginationItem>
-                      <PaginationItem><PaginationLink next tag="button">Next</PaginationLink></PaginationItem>
-                    </Pagination>
+                  <Pagination items={this.state.products} onChangePage={this.onChangePage} />
                   </nav>
                 </CardBody>
               </Card>

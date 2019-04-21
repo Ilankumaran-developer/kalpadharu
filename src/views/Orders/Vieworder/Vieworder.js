@@ -1,8 +1,9 @@
 import React, { Component } from 'react';
-import { Alert, FormGroup, Label, Input, Button, Badge, Card, CardBody, CardHeader, Col, Pagination, PaginationItem, PaginationLink, Row, Table } from 'reactstrap';
+import { Alert, FormGroup, Label, Input, Button, Badge, Card, CardBody, CardHeader, Col, Row, Table } from 'reactstrap';
 import axios from 'axios';
 import { HashLoader } from 'react-spinners';
 import { css } from '@emotion/core';
+import Pagination from '../../common/Pagination/pagination';
 
 
 class Products extends Component {
@@ -15,7 +16,8 @@ class Products extends Component {
       loading: true,
       grandSum: 0,
       from_date: '',
-      to_date: ''
+      to_date: '',
+      pageOfItems : []
 
     }
     this.constructHistory = this.constructHistory.bind(this);
@@ -27,8 +29,13 @@ class Products extends Component {
     this.toDateChange = this.toDateChange.bind(this);
     this.sendEmail = this.sendEmail.bind(this);
     this.getPDF = this.getPDF.bind(this);
+    this.onChangePage = this.onChangePage.bind(this);
     
   }
+  onChangePage(pageOfItems) {
+    // update state with new page of items
+    this.setState({ pageOfItems: pageOfItems });
+}
   componentDidMount() {
     axios.get(`http://localhost:2018/showorders`).then((result) => {
       console.log(result)
@@ -48,7 +55,7 @@ class Products extends Component {
   }
   sendEmail(id) {
     console.log('asdasd')
-    axios.post('http://localhost:2018/sendEmail', {}).then((result) => {
+    axios.post('http://localhost:2018/sendEmail', {id:id}).then((result) => {
       console.log(result)
       if (result.status == 200) {
         this.setState({ alert: true })
@@ -148,8 +155,8 @@ class Products extends Component {
   }
   constructHistory() {
     let orders = []
-    let clone = this.state.orders
-
+    let clone = this.state.pageOfItems
+    console.log('cloneeeedddd',this.state.pageOfItems)
     for (var i in clone) {
 
 
@@ -159,7 +166,7 @@ class Products extends Component {
       temp.push(<td>{clone[i].grand_total}</td>)
       temp.push(<td>{clone[i].profit}</td>)
       temp.push(<td>{clone[i].service_tax}</td>)
-      temp.push(<td><Button onClick={this.editOrder.bind(this, clone[i]._id)} color="info">Edit</Button>&nbsp;<Button onClick={this.viewInvoice.bind(this, clone[i]._id)} color="info">View Invoice</Button>&nbsp;<Button onClick={this.sendEmail.bind(this, clone[i]._id)} color="danger">Email to user</Button>&nbsp;<Button onClick={this.getPDF.bind(this, clone[i]._id)} color="success">Download as PDF</Button></td>)
+      temp.push(<td><Button onClick={this.viewInvoice.bind(this, clone[i]._id)} color="info">View Invoice</Button>&nbsp;<Button onClick={this.sendEmail.bind(this, clone[i]._id)} color="danger">Email to user</Button>&nbsp;<Button onClick={this.getPDF.bind(this, clone[i]._id)} color="success">Download as PDF</Button></td>)
 
       orders.push(<tr>{temp}</tr>)
 
@@ -225,19 +232,7 @@ class Products extends Component {
 
                     </tbody>
                   </Table>
-                  <nav>
-          
-                    <Pagination>
-                      <PaginationItem><PaginationLink previous tag="button">Prev</PaginationLink></PaginationItem>
-                      <PaginationItem active>
-                        <PaginationLink tag="button">1</PaginationLink>
-                      </PaginationItem>
-                      <PaginationItem><PaginationLink tag="button">2</PaginationLink></PaginationItem>
-                      <PaginationItem><PaginationLink tag="button">3</PaginationLink></PaginationItem>
-                      <PaginationItem><PaginationLink tag="button">4</PaginationLink></PaginationItem>
-                      <PaginationItem><PaginationLink next tag="button">Next</PaginationLink></PaginationItem>
-                    </Pagination>
-                  </nav>
+                  <Pagination items={this.state.orders} onChangePage={this.onChangePage} />
                 </CardBody>
               </Card>
             </Col>

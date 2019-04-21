@@ -54,7 +54,8 @@ class Forms extends Component {
       listStatus : '',
       quantity : 0,
       total_sales: 0,
-      inventoryId : 0
+      inventoryId : 0,
+      productID:0
     };
   }
   componentDidMount(){
@@ -76,12 +77,13 @@ class Forms extends Component {
     event.preventDefault();
     this.setState({loading:true})
     console.log(this.state.sku, this.state.listStatus, this.state.quantity)
-    if(this.listStatus != '' && this.state.sku != ''){
+    if(this.state.listStatus != '' && this.state.sku != ''){
         let payload = {};
         payload.id = this.state.inventoryId;
         payload.status = this.state.listStatus;
         payload.sku = this.state.sku;
         payload.quantity = this.state.quantity;
+        payload.productID = this.state.productID;
         axios.post('http://localhost:2018/updateInventory',payload).then((result)=>{
             this.setState({loading:false})
             if(result.status == 200){
@@ -91,6 +93,9 @@ class Forms extends Component {
                 alert('There should be some issue with system...sorry for inconvenience');
             }
         })
+    }
+    else{
+      alert('Kindly select the status')
     }
   }
   quantityChange(event){
@@ -107,7 +112,15 @@ class Forms extends Component {
   }
   skuChange(event){
       if(!event.target.value == "0"){
+        let products = this.state.products
         this.setState({sku : event.target.value})
+        for(var i  in products)
+        {
+        
+          if(products[i].sku == event.target.value)
+            this.setState({productID:products[i]._id})
+          
+        }
         axios.get(`http://localhost:2018/get/Inventory?sku=${event.target.value}`).then((result)=>{
             console.log('inventory data',result)
             if(result.data.length != 0)

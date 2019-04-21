@@ -179,6 +179,7 @@ class Forms extends Component {
       console.log(this.state.selling_price_per_kg,event.target.value);
       let sp = this.state.selling_price_per_kg * parseFloat(event.target.value * 1000) 
       console.log(sp)
+      sp = parseFloat(sp).toFixed(2);
       this.setState({
           selling_price: sp
       })
@@ -431,7 +432,7 @@ class Forms extends Component {
                         <tr>
                           <td>{item.product_name}</td>
                           <td>{item.unit}</td>
-                          <td>{item.selling_price} <Button  color="danger" onClick={this.removeitem.bind(this,i)} size="sm" className="btn-pill">Remove</Button></td>
+                          <td>{item.selling_price}   &nbsp;&nbsp;&nbsp; <Button  color="danger" onClick={this.removeitem.bind(this,i)} size="sm" className="btn-pill">    Remove</Button></td>
                         </tr>
                       ]
                     })}

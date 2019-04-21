@@ -65,9 +65,9 @@ class Invoice extends Component {
             let temp = [];
               console.log(i, line_item_product[i])
                   temp.push(<td>{line_item_product[i].product_name}</td>)
-                  temp.push(<td>{parseFloat(line_item_product[i].sku_min_sp)} per ({parseFloat(line_item_product[i].sku_min_unit) * 1000}) grams</td>)
-                  temp.push(<td>{parseFloat(line_item_product[i].unit) * 1000} grams</td>)
-                  temp.push(<td>{parseFloat(line_item_product[i].selling_price).toFixed(2)}</td>)
+                  
+                  temp.push(<td className="text-center">{parseFloat(line_item_product[i].unit) * 1000} grams</td>)
+                  temp.push(<td className="text-right">{parseFloat(line_item_product[i].selling_price).toFixed(2)}</td>)
                   line_items.push(<tr>{temp}</tr>)
             }
         return line_items 
@@ -113,7 +113,7 @@ class Invoice extends Component {
                                             <thead>
                                                 <tr>
                                                     <td><strong>Item</strong></td>
-                                                    <td className="text-center"><strong>Price</strong></td>
+                                                   
                                                     <td className="text-center"><strong>Quantity</strong></td>
                                                     <td className="text-right"><strong>Totals</strong></td>
                                                 </tr>
@@ -124,19 +124,19 @@ class Invoice extends Component {
                                                     <td className="thick-line"></td>
                                                     <td className="thick-line"></td>
                                                     <td className="thick-line text-center"><strong>Subtotal</strong></td>
-                                                    <td className="thick-line text-right">{this.state.subtotal}</td>
+                                                    <td className="thick-line text-center">{this.state.subtotal}</td>
                                                 </tr>
                                                 <tr>
                                                     <td className="no-line"></td>
                                                     <td className="no-line"></td>
                                                     <td className="no-line text-center"><strong>Service Tax(GST)</strong></td>
-                                                    <td className="no-line text-right">{this.state.service_tax}</td>
+                                                    <td className="no-line text-center">{this.state.service_tax}</td>
                                                 </tr>
                                                 <tr>
                                                     <td className="no-line"></td>
                                                     <td className="no-line"></td>
-                                                    <td className="no-line text-center"><strong>Total</strong></td>
-                                                    <td className="no-line text-right">{this.state.grand_total}</td>
+                                                    <td className="no-line text-center"><strong> Grand Total</strong></td>
+                                                    <td className="no-line text-center">{this.state.grand_total}</td>
                                                 </tr>
                                             </tbody>
                                         </table>
