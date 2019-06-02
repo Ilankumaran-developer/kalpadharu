@@ -22,6 +22,10 @@ class DefaultHeader extends Component {
       console.log(result)
     })
   }
+  backup(){
+  
+    window.location.href="http://localhost:2018/backupData";
+  }
   render() {
 
     // eslint-disable-next-line
@@ -67,7 +71,7 @@ class DefaultHeader extends Component {
               <DropdownItem><i className="fa fa-lock"></i> Logout</DropdownItem>
             </DropdownMenu> */}
              <ButtonGroup className="float-right">
-            <Button color="primary" className="float-right">Backup data</Button>
+            <Button color="primary" onClick={this.backup.bind()} className="float-right">Backup data</Button>
             <Button color="danger" onClick={this.flushData.bind()} className="float-right">Flush data</Button>
             </ButtonGroup>
           </AppHeaderDropdown>
