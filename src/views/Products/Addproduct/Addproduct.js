@@ -52,6 +52,19 @@ class Forms extends Component {
       err: false
     };
   }
+  componentDidMount(){
+    let fn = {
+      cors: function(){
+        
+        if(this.state.loading)
+          alert('seems like CORS is stopping you to contact server....kindly turn on or reset the CORS plugin on your browser and reload')
+      }
+    }
+    let c = fn.cors.bind(this)
+    setTimeout(function(){
+      c()
+    }, 4000)
+  }
   addproduct(event){
     event.preventDefault();
     console.log(this.state)

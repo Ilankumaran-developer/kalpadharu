@@ -28,9 +28,20 @@ class Inventory extends Component {
 }
   
   componentDidMount(){
+    let fn = {
+      cors: function(){
+        
+        if(this.state.loading)
+          alert('seems like CORS is stopping you to contact server....kindly turn on or reset the CORS plugin on your browser and reload')
+      }
+    }
+    let c = fn.cors.bind(this)
+    setTimeout(function(){
+      c()
+    }, 4000)
       try{
         axios.get(`http://localhost:2018/list/Inventory`).then((result)=>{
-      console.log('show result',result)
+      
       if(result.status == 200)
       { 
 
@@ -49,9 +60,9 @@ class Inventory extends Component {
     this.props.history.push('/add/inventory')
   }
   deleteProduct(val,e){
-    console.log(val,e)
+    
     axios.post('http://localhost:2018/deleteProduct',val).then((result)=>{
-      console.log(result)
+      
       if(result.status == 200)
       {
         this.setState({products:result.data})

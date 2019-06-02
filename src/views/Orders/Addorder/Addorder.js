@@ -76,8 +76,19 @@ class Forms extends Component {
     };
   }
   componentDidMount(){
+    let fn = {
+      cors: function(){
+        
+        if(this.state.loading)
+          alert('seems like CORS is stopping you to contact server....kindly turn on or reset the CORS plugin on your browser and reload')
+      }
+    }
+    let c = fn.cors.bind(this)
+    setTimeout(function(){
+      c()
+    }, 4000)
     axios.get(`http://localhost:2018/show?status=in_stock`).then((result)=>{
-      console.log('resulttttt',result)
+      
       if(result.data.length != 0){
         if(result.status == 200 && result.data.length != 0)
         {
@@ -111,7 +122,7 @@ class Forms extends Component {
     return products;
   }
   removeitem(index){
-    console.log(index)
+    
     let temp = [];
     for(let i in this.state.line_items){
       if(i != index)
@@ -124,15 +135,19 @@ class Forms extends Component {
   addproduct(event){
     event.preventDefault();
     axios.get(`http://localhost:2018/get/Inventory?sku=${this.state.sku}`).then((result)=>{
-    console.log('inventoey detrails', result)
-    let remainingCount = 0, lineItemhitCount = 0;
+    
+    let remainingCount = 0, lineItemhitCount = parseFloat(this.state.unit_price);
     for(let i in this.state.line_items){
         if(this.state.line_items[i].sku == this.state.sku)
         {
-          lineItemhitCount = lineItemhitCount + 1;
+          
+          lineItemhitCount = parseFloat(lineItemhitCount) + parseFloat(this.state.line_items[i].unit);
         }
     }
-    if(parseInt(result.data[0].quantity) - lineItemhitCount > 0){
+    
+    
+    
+    if(parseFloat(result.data[0].quantity) - parseFloat(lineItemhitCount) >= 0.0){
       let temp = [];
     temp = this.state.line_items;
     let profit  = parseFloat(this.state.selling_price) - parseFloat(this.state.cost_price);
@@ -176,9 +191,9 @@ class Forms extends Component {
         unit_price : event.target.value
       })
      
-      console.log(this.state.selling_price_per_kg,event.target.value);
+      
       let sp = this.state.selling_price_per_kg * parseFloat(event.target.value * 1000) 
-      console.log(sp)
+      
       sp = parseFloat(sp).toFixed(2);
       this.setState({
           selling_price: sp
@@ -227,7 +242,7 @@ class Forms extends Component {
       payload.profit = totprofit;
       payload.status = this.state.status;
       payload.grand_total = parseFloat(this.state.grand_total).toFixed(2);
-      console.log(payload)
+      
       axios.post('http://localhost:2018/saveOrder',payload).then((result)=>{
         this.setState({loading: false})
         if(result.status == 200){

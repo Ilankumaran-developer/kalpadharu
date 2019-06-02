@@ -5,6 +5,9 @@ import PropTypes from 'prop-types';
 import { AppAsideToggler, AppHeaderDropdown, AppNavbarBrand, AppSidebarToggler } from '@coreui/react';
 import logo from '../../assets/img/brand/logo.svg'
 import sygnet from '../../assets/img/brand/sygnet.svg'
+import axios from 'axios';
+
+import {Button, ButtonGroup} from 'reactstrap';
 
 const propTypes = {
   children: PropTypes.node,
@@ -13,6 +16,12 @@ const propTypes = {
 const defaultProps = {};
 
 class DefaultHeader extends Component {
+  flushData(){
+    axios.get(`http://localhost:2018/flusheverything`).then((result)=>{
+      window.location.reload();
+      console.log(result)
+    })
+  }
   render() {
 
     // eslint-disable-next-line
@@ -26,7 +35,7 @@ class DefaultHeader extends Component {
           minimized={{ src: sygnet, width: 30, height: 30, alt: 'CoreUI Logo' }}
         /> */}
         <AppSidebarToggler className="d-md-down-none" display="lg" />
-
+        
        
         <Nav className="ml-auto" navbar>
          {/*  <NavItem className="d-md-down-none">
@@ -57,8 +66,14 @@ class DefaultHeader extends Component {
               <DropdownItem><i className="fa fa-shield"></i> Lock Account</DropdownItem>
               <DropdownItem><i className="fa fa-lock"></i> Logout</DropdownItem>
             </DropdownMenu> */}
+             <ButtonGroup className="float-right">
+            <Button color="primary" className="float-right">Backup data</Button>
+            <Button color="danger" onClick={this.flushData.bind()} className="float-right">Flush data</Button>
+            </ButtonGroup>
           </AppHeaderDropdown>
+          
         </Nav>
+        
         {/* <AppAsideToggler className="d-md-down-none" /> */}
         {/*<AppAsideToggler className="d-lg-none" mobile />*/}
       </React.Fragment>

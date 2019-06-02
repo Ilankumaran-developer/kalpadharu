@@ -59,15 +59,33 @@ class Forms extends Component {
     };
   }
   componentDidMount(){
-    axios.get(`http://localhost:2018/show`).then((result)=>{
+    
+    let fn = {
+      cors: function(){
+        
+        if(this.state.loading)
+          alert('seems like CORS is stopping you to contact server....kindly turn on or reset the CORS plugin on your browser and reload')
+      }
+    }
+    let c = fn.cors.bind(this)
+    setTimeout(function(){
+      c()
+    }, 4000)
+    try{
+      axios.get(`http://localhost:2018/show`).then((result)=>{
+      console.log('resulttttt', result)
         this.setState({loading: false})
-        console.log(result)
+        
         if(result.data.length != 0){
 
             this.setState({products : result.data});
         }
         
     })
+    }catch(e){
+      console.log('errrrrr', e)
+    }
+    
   }
   statusChange(event){
       //event.preventDefault();
@@ -76,7 +94,7 @@ class Forms extends Component {
   updateInventory(event){
     event.preventDefault();
     this.setState({loading:true})
-    console.log(this.state.sku, this.state.listStatus, this.state.quantity)
+    
     if(this.state.listStatus != '' && this.state.sku != ''){
         let payload = {};
         payload.id = this.state.inventoryId;
@@ -122,7 +140,7 @@ class Forms extends Component {
           
         }
         axios.get(`http://localhost:2018/get/Inventory?sku=${event.target.value}`).then((result)=>{
-            console.log('inventory data',result)
+            
             if(result.data.length != 0)
             {   
                 this.setState({quantity: result.data[0].quantity});
@@ -213,7 +231,7 @@ class Forms extends Component {
                       <Label htmlFor="text-input">Quantity</Label>
                     </Col>
                     <Col xs="12" md="9">
-                      <Input type="number" id="text-input" name="text-input" value={this.state.quantity} onChange={this.quantityChange} placeholder="Quantity" />
+                      <Input type="number" step="0.1"  id="text-input" name="text-input" value={this.state.quantity} onChange={this.quantityChange} placeholder="Quantity" />
                      
                     </Col>
                   </FormGroup>
